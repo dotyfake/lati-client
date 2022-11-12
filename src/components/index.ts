@@ -1,0 +1,10 @@
+export { default as Header } from './layouts/Header/Header';
+export { default as Footer } from './layouts/Footer/Footer';
+export { default as Games } from './layouts/Sidebar/Games';
+export { default as Root } from './layouts/Root/Root';
+export { default as LoadingIcon } from './Loading/LoadingIcon';
+export { default as SidebarItem } from './SidebarItem';
+export { default as InfiniteScroll} from './InfiniteScroll';
+export { default as PrivatePage } from './PrivatePage';
+export { default as PostSidebar } from './layouts/Sidebar/PostSidebar';
+export { default as DefaultLayout } from './layouts/DefaultLayout/DefaultLayout';
