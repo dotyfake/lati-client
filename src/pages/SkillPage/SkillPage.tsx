@@ -142,7 +142,7 @@ const SkillPage = (props: Props) => {
 
      {skills.length === 0 ? <div className="skills-body">
       <div className="row">
-        {Array(10).fill(0).map((item, index)=> <div className="skill col l-6 c-12">
+        {Array(10).fill(0).map((item, index)=> <div key={index} className="skill col l-6 c-12">
           <div className="skill-body">
             <div className="skill-left">
               <Skeleton width={204} height={204}/>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
 import { FaPaperPlane, FaComment, FaHeart } from "react-icons/fa";
@@ -8,38 +8,31 @@ import { LoadingIcon, InfiniteScroll } from "components";
 
 //redux
 import {
-  useGetPostsQuery,
   useUpdateLikeMutation,
-  useCreateCommentMutation,
 } from "redux/posts/postSlice";
 import { useAppSelector, useAppDispatch } from "app/hooks";
 import { setUserInfo } from "redux/user/loginSlice";
+import { useUpdateUserFollowingMutation } from "redux/user/accountSlice/accountSlice";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-import { PostType } from "utils/interfaces";
 import { Link, useParams } from "react-router-dom";
-import { log } from "console";
 import Sad from "components/layouts/Header/components/Sad";
 import ListComment, { CommentType } from "./ListComment";
-import { setPostsFollowing, setPostsNew, setPostsProfile } from "redux/posts/postsSlice";
+
 import { useAuth } from "utils/hooks";
-import { useUpdateUserFollowingMutation } from "redux/user/accountSlice/accountSlice";
 import axiosPublic from "utils/axiosPublic";
+import { PostType } from "utils/interfaces";
+
 type Props = {
   newPost: PostType | undefined;
   fetchPostType: 'following' | 'profile' | 'newPosts';
   noMarginTop?: boolean;
 };
 
-type LikeDataType = {
-  like: [string];
-  postId: string;
-};
-
 const NewsFeed = (props: Props) => {
-  const { login, posts } = useAppSelector((state) => state);
+  const { login } = useAppSelector((state) => state);
 
   const dispatch = useAppDispatch();
   const [page, setPage] = useState(1);
@@ -49,13 +42,6 @@ const NewsFeed = (props: Props) => {
   const isAuth = useAuth();
   const newPost = props.newPost;
   const param = useParams();
-
-  // const { data } = useGetPostsQuery({
-  //   page: page,
-  //   following: props.fetchPostType === 'following' ? login.userInfo?.id : undefined,
-  //   profile: props.fetchPostType === 'profile' ? param.userId : undefined,
-  //   newPosts: props.fetchPostType === 'newPosts' ? login.userInfo?.id : undefined,
-  // });
 
   const [updateLike, { data: dataLike, isSuccess }] = useUpdateLikeMutation();
 
@@ -98,7 +84,6 @@ const handleUpdateUserFollowing = (post : PostType) => {
           newPosts: props.fetchPostType === 'newPosts' ? login.userInfo?.id : undefined,
         }
       })
-      console.log(res.data);
       if(res.data){
         setListPost([...listPost,...res.data.posts])
         setTotalRows(res.data.countPost)
@@ -115,25 +100,10 @@ const handleUpdateUserFollowing = (post : PostType) => {
   }, [dataUserFollowing]);
 
   useEffect(() => {
-    if (listPost.length > 0)
-      dispatch(
-        setPostsNew(listPost)
-      );
-  }, [listPost]);
-
-  useEffect(() => {
     if (newPost)
-      dispatch(setPostsNew([newPost, ...listPost] as [PostType]));
+    setListPost([newPost, ...listPost] as [PostType])
   }, [newPost]);
 
-  // useEffect(()=> {
-  //   if(data){
-  //     setListPost([...listPost, ...data.posts])
-  //     setTotalRows(data.countPost)
-  //   }
-  //   return ()=> {
-  //   }
-  // },[data])
 
   useEffect(() => {
     if (dataLike) {
