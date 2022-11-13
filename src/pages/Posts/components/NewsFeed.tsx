@@ -81,7 +81,7 @@ const handleUpdateUserFollowing = (post : PostType) => {
           page: page,
           following: props.fetchPostType === 'following' ? login.userInfo?.id : undefined,
           profile: props.fetchPostType === 'profile' ? param.userId : undefined,
-          newPosts: props.fetchPostType === 'newPosts' ? login.userInfo?.id : undefined,
+          newPosts: props.fetchPostType === 'newPosts' ? true : undefined,
         }
       })
       if(res.data){

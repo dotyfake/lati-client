@@ -114,6 +114,7 @@ const Button = (props: Props) => {
         contentLabel="Example Modal"
         shouldCloseOnOverlayClick={true}
         ariaHideApp={false}
+        className = "animate__animated animate__rubberBand animate__fadeOut"
         style={{
           content: {
             top: "50%",
