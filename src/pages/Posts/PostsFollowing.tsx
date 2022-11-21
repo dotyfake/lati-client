@@ -1,9 +1,4 @@
-import React, { useState, useEffect } from "react";
-
 //components
-import CreatePost from "./components/CreatePost";
-
-import { PostType } from "utils/interfaces";
 import NewsFeed from "./components/NewsFeed";
 import styled from "styled-components";
 

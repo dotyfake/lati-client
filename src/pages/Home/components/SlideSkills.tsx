@@ -87,7 +87,6 @@ const SlideSkills = (props: Props) => {
   const { listGame } = useAppSelector((state) => state);
   const gameArray = listGame.listGame;
 
-  const listGameSkeleton: any[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5];
 
   return (
     <Wrapper>
@@ -114,7 +113,7 @@ const SlideSkills = (props: Props) => {
         modules={[Navigation]}
         className="mySwiper"
       >
-        {listGame.loading ? listGameSkeleton.map((item, i)=>  <SwiperSlide key={i}>
+        {listGame.loading ? Array(15).fill(0).map((item, i)=>  <SwiperSlide key={i}>
             <div className="skeleton">
               <Skeleton width={142} height={142}/>
             </div>
@@ -123,7 +122,7 @@ const SlideSkills = (props: Props) => {
             <Link to = {`/skill/${game.slug}`}>
               <div className="game">
                   <div className="image">
-                  <img src={game.iconUrl} alt={game.name} />
+                  <img src={game.pcImageUrl} alt={game.name} />
                   </div>
                   <p>{game.name}</p>
               </div>

@@ -10,7 +10,14 @@ export const userApi = createApi({
           method: "GET",
         }),
     }),
+    getAllUser: builder.query<any, {page?: number; limit?: number}>({
+        query: (payload) => ({
+          url: `user/allUser`,
+          method: "GET",
+          params: payload
+        }),
+    }),
   }),
 })
 
-export const {useGetUserQuery } = userApi
+export const {useGetUserQuery, useGetAllUserQuery } = userApi

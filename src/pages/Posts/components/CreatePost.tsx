@@ -19,6 +19,7 @@ import { setUserInfo } from 'redux/user/loginSlice';
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import Uploading from "components/Loading/Uploading";
+import { useAuth } from "utils/hooks";
 
 import { PostType } from 'utils/interfaces';
 
@@ -33,6 +34,8 @@ const CreatePost = (props: Props) => {
   const [contentPost, setContentPost] = useState("");
   const [showCreatePostModal, setShowCreatePostModal] =
     useState<boolean>(false);
+
+    const isAuth = useAuth()
 
   const [createPost, { data, isLoading }] = useCreatePostMutation();
 
@@ -73,12 +76,12 @@ const CreatePost = (props: Props) => {
 
   return (
     <Wrapper>
-      <button
+      {isAuth && <button
         className="btn-create-post"
         onClick={() => setShowCreatePostModal(true)}
       >
         <FaRegEdit /> Create Post
-      </button>
+      </button>}
       <Modal
         isOpen={showCreatePostModal}
         onRequestClose={closeModal}
@@ -270,6 +273,7 @@ const Wrapper = styled.div`
     position: fixed;
     bottom: 30px;
     right: 30px;
+    z-index: 1000;
 
     svg {
       margin-right: 4px;

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation,FreeMode } from "swiper";
+import { Navigation } from "swiper";
 
 import "swiper/css";
 import "swiper/css/free-mode";
@@ -107,7 +107,7 @@ const Tabs = (props: Props) => {
           </div>
       </div>}
       {
-        tabActive === "Posts" && <NewsFeed fetchPostType='profile' newPost={undefined} noMarginTop />
+        tabActive === "Posts" && <NewsFeed fetchPostType='profile' newPost={undefined} noMarginTop isMobile />
       }
     </Wrapper>
   );

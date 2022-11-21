@@ -53,7 +53,13 @@
 
 @media (max-width: 739px) {
     .wide {
-        width: 90vw;
+        width: 95vw;
+        margin: 0 auto;
+    }
+
+    .wide-m {
+        width: 95vw;
+        margin: 0 auto;
     }
 
     .c-0 {

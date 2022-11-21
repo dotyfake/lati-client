@@ -4,7 +4,7 @@ export const skillsApi = createApi({
   reducerPath: 'skillsApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3000/api/' }),
   endpoints: (builder) => ({
-    getSkills: builder.query<any, {slug: string; page?: number; limit?: number}>({
+    getSkills: builder.query<any, {slug?: string; page?: number; limit?: number}>({
         query: (payload) => ({
           url: `/skills/${payload.slug}`,
           method: 'GET',

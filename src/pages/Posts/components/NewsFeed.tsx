@@ -1,35 +1,41 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { FaPaperPlane, FaComment, FaHeart } from "react-icons/fa";
+import { FaComment, FaHeart, FaPaperPlane } from "react-icons/fa";
 
 //components
-import { LoadingIcon, InfiniteScroll } from "components";
+import { InfiniteScroll, LoadingIcon } from "components";
 
 //redux
+import { useAppDispatch, useAppSelector } from "app/hooks";
 import {
-  useUpdateLikeMutation,
+  useUpdateLikeMutation
 } from "redux/posts/postSlice";
-import { useAppSelector, useAppDispatch } from "app/hooks";
-import { setUserInfo } from "redux/user/loginSlice";
 import { useUpdateUserFollowingMutation } from "redux/user/accountSlice/accountSlice";
+import { setUserInfo } from "redux/user/loginSlice";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-import { Link, useParams } from "react-router-dom";
 import Sad from "components/layouts/Header/components/Sad";
-import ListComment, { CommentType } from "./ListComment";
+import { Link, useParams } from "react-router-dom";
+import ListComment from "./ListComment";
 
-import { useAuth } from "utils/hooks";
 import axiosPublic from "utils/axiosPublic";
+import { useAuth } from "utils/hooks";
 import { PostType } from "utils/interfaces";
 
 type Props = {
   newPost: PostType | undefined;
   fetchPostType: 'following' | 'profile' | 'newPosts';
   noMarginTop?: boolean;
+  isMobile?: boolean
 };
+
+interface StyledWrapperType {
+  noMarginTop?: boolean,
+  isMobile?: boolean
+}
 
 const NewsFeed = (props: Props) => {
   const { login } = useAppSelector((state) => state);
@@ -43,9 +49,9 @@ const NewsFeed = (props: Props) => {
   const newPost = props.newPost;
   const param = useParams();
 
-  const [updateLike, { data: dataLike, isSuccess }] = useUpdateLikeMutation();
+  const [updateLike, { data: dataLike }] = useUpdateLikeMutation();
 
-  const [updateUserFollowing, { data: dataUserFollowing, isLoading }] =
+  const [updateUserFollowing, { data: dataUserFollowing }] =
   useUpdateUserFollowingMutation();
 
 const handleUpdateUserFollowing = (post : PostType) => {
@@ -58,6 +64,7 @@ const handleUpdateUserFollowing = (post : PostType) => {
       followingUserId: post.user._id,
     });
 };
+
 
 
   const handleUpdateLike = (postId: string, postUserId: string) => {
@@ -118,7 +125,7 @@ const handleUpdateUserFollowing = (post : PostType) => {
   }, [dataLike]);
 
   return (
-    <Wrapper >
+    <Wrapper noMarginTop = {props.noMarginTop} isMobile = {props.isMobile}>
       <div className="posts wide-m">
         <div className="news-feed">
           {listPost.length > 0 ? (
@@ -160,7 +167,7 @@ const handleUpdateUserFollowing = (post : PostType) => {
                           <div className="time">{dateTime}</div>
                         </div>
                       </div>
-                      {post.user._id !== login.userInfo?.id && <div className="follow">
+                      {!isAuth || (post.user._id !== login.userInfo?.id) && <div className="follow">
                         {!login.userInfo?.following.includes(post.user._id) ? (
                           <button className="btn-follow animate__animated animate__fadeInanimate__fadeOut" onClick={()=> handleUpdateUserFollowing(post)}>
                              <span>Follow</span>
@@ -173,41 +180,44 @@ const handleUpdateUserFollowing = (post : PostType) => {
                       </div>}
                     </div>
                     <div className="post-body">
-                      <p className="post-content">{post.content}</p>
-                      {post.photo.photoUrl && (
-                        <div className="photo">
-                          <img
-                            className="image"
-                            src={post.photo.photoUrl}
-                            alt=""
-                          />
+                      <div className="post-group">
+                        <p className="post-content">{post.content}</p>
+                        {post.photo.photoUrl && (
+                          <div className="photo">
+                            <img
+                              className="image"
+                              src={post.photo.photoUrl}
+                              alt=""
+                            />
+                            {/* <ViewImage src={post.photo.photoUrl} alt=""/> */}
+                          </div>
+                        )}
+                        <div className="reaction">
+                          <button
+                            className={
+                              login.userInfo &&
+                              post.like.includes(login.userInfo?.id)
+                                ? "btn-reaction like liked animate__animated animate__rubberBand"
+                                : "btn-reaction like"
+                            }
+                            onClick={() =>
+                              handleUpdateLike(post._id, post.user._id)
+                            }
+                          >
+                            <FaHeart />
+                            {`${post.like.length}`}
+                          </button>
+                          <button
+                            className="btn-reaction comments"
+                            onClick={() => setShowComments((prev) => !prev)}
+                          >
+                            <FaComment />
+                            {`${post.comments.length}`}
+                          </button>
+                          <button className="btn-reaction chat">
+                            <FaPaperPlane /> Chat
+                          </button>
                         </div>
-                      )}
-                      <div className="reaction">
-                        <button
-                          className={
-                            login.userInfo &&
-                            post.like.includes(login.userInfo?.id)
-                              ? "btn-reaction like liked animate__animated animate__rubberBand"
-                              : "btn-reaction like"
-                          }
-                          onClick={() =>
-                            handleUpdateLike(post._id, post.user._id)
-                          }
-                        >
-                          <FaHeart />
-                          {`${post.like.length}`}
-                        </button>
-                        <button
-                          className="btn-reaction comments"
-                          onClick={() => setShowComments((prev) => !prev)}
-                        >
-                          <FaComment />
-                          {`${post.comments.length}`}
-                        </button>
-                        <button className="btn-reaction chat">
-                          <FaPaperPlane /> Chat
-                        </button>
                       </div>
                       <ListComment postId={post._id} comments={post.comments} />
                     </div>
@@ -253,15 +263,15 @@ const handleUpdateUserFollowing = (post : PostType) => {
   );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<StyledWrapperType>`
   .posts {
     background-color: var(--white-color);
-    margin: calc(var(--header-height) + 20px) auto 0;
+    margin: 0 auto;
+    margin-top: ${props => props.noMarginTop ? '20px' : '84px'};
     padding: 18px;
     border-radius: 4px;
 
     .post {
-      padding: 20px;
       margin: 0 auto 20px;
       .post-header {
         display: flex;
@@ -297,27 +307,27 @@ const Wrapper = styled.div`
        }
       }
       .post-body {
+        .post-group{
+          width: ${props => props.isMobile ? '95vw' : '540px'};
+          margin: 0 auto;
+        }
         .post-content {
           font-size: 14px;
           font-weight: 500;
-          margin: 12px 56px;
+          margin: 12px 0;
         }
         .photo {
-          display: flex;
-          justify-content: center;
           .image {
-            width: 90vw;
-            max-width: 540px;
-            height: 540px;
+            width: ${props => props.isMobile ? '90%' : '540px'};
+            height: ${props => props.isMobile ? '300px' : '540px'};
             object-position: center;
             object-fit: cover;
-            border-radius: 12px;
-            margin: 0 auto;
+            border-radius: ${props => props.isMobile ? '6px' : '12px'};
           }
         }
         .reaction {
           display: flex;
-          margin: 10px 56px;
+          margin: 12px 0;
           .btn-reaction {
             display: flex;
             margin-right: 18px;

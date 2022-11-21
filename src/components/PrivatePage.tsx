@@ -1,23 +1,23 @@
-import { useAppSelector } from 'app/hooks';
 import React from 'react'
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from 'utils/hooks';
 
 type Props = {
     children: React.ReactNode
 }
 
 const PrivatePage = (props: Props) => {
-    const { login } = useAppSelector((state) => state);
     const navigate = useNavigate()
+    const isAuth = useAuth()
+    
     useEffect(()=> {
-        if(!login.userInfo){
-            navigate('/')
-        }
+            if (!isAuth ) {
+                navigate('/')
+              }
     },[])
-
   return (
-    <div>
+    <div >
         {props.children}
     </div>
   )

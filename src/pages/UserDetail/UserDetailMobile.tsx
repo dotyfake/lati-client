@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import images from "assets/images";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Tabs from "./components/Tabs";
 import { copyToClipboard } from "utils/copyToClipboard";
@@ -14,7 +14,14 @@ import { useGetUserQuery } from "redux/user/userDetailSlice";
 import { useUpdateUserFollowingMutation } from "redux/user/accountSlice/accountSlice";
 
 //icon
-import { FaAngleLeft, FaAngleRight, FaRegCopy, FaUserCheck, FaUserPlus } from "react-icons/fa";
+import {
+  FaAngleLeft,
+  FaAngleRight,
+  FaRegCopy,
+  FaUserCheck,
+  FaUserPlus,
+  FaChevronLeft,
+} from "react-icons/fa";
 
 //swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -24,6 +31,7 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
+import PageAnimate from "components/PageAnimate";
 
 type Props = {};
 
@@ -44,7 +52,6 @@ const UserDetail = (props: Props) => {
   const [updateUserFollowing, { data: dataUserFollowing }] =
     useUpdateUserFollowingMutation();
 
-
   const handleUpdateUserFollowing = () => {
     const action = followStatus ? "unfollow" : "follow";
     if (login.userInfo)
@@ -57,9 +64,7 @@ const UserDetail = (props: Props) => {
 
   useEffect(() => {
     if (login.userInfo)
-      dispatch(
-        setUserInfo({ ...login.userInfo, ...dataUserFollowing })
-      );
+      dispatch(setUserInfo({ ...login.userInfo, ...dataUserFollowing }));
   }, [dataUserFollowing]);
 
   useEffect(() => {
@@ -85,149 +90,170 @@ const UserDetail = (props: Props) => {
 
   return (
     <Wrapper>
-      {userDetail && photos && (
-        <div className="grid wide">
-          <div className="user-header">
-            <div className="header-left">
-              <div className="header-avatar">
-                <img src={userDetail.avatar.avatarUrl} alt="avatar" />
-              </div>
-              <div>
-                <div className="nickname">
-                  {userDetail.displayName}
-                  <span>
-                    <img src={images.girl} alt="age" />
-                    20
-                  </span>
+      <PageAnimate>
+        <Link to = "/">
+          <button className="back">
+            <FaChevronLeft />
+          </button>
+        </Link>
+        {userDetail && photos && (
+          <div className="grid wide">
+            <div className="user-header">
+              <div className="header-left">
+                <div className="header-avatar">
+                  <img src={userDetail.avatar.avatarUrl} alt="avatar" />
                 </div>
-                <div className="id">
-                  <img src={images.id} alt="" />
-                  <span>{userDetail.username}</span>
-                  <button
-                    onClick={() => {
-                      toast.success("Id copied!");
-                      copyToClipboard(userDetail.username);
-                    }}
-                  >
-                    <FaRegCopy />
-                  </button>
-                </div>
-              </div>
-            </div>
-            {params.userId !== login.userInfo?.id && <div className="follow">
-              {followStatus ? (
-                <button onClick={handleUpdateUserFollowing} className="following">
-                  <FaUserCheck />
-                  Following
-                </button>
-              ) : (
-                <button onClick={handleUpdateUserFollowing}>
-                  <FaUserPlus />
-                  Follow
-                </button>
-              )}
-            </div>}
-          </div>
-          <div className="user-body">
-            <div className="row no-gutters">
-              <div className="body-left col l-4 c-12">
-                <div className="photos">
-                  <div className="main-photo">
-                    <Swiper
-                      loop
-                      modules={[Thumbs, Navigation]}
-                      slidesPerView={1}
-                      spaceBetween={0}
-                      thumbs={{
-                        swiper:
-                          thumbsSwiper && !thumbsSwiper.destroyed
-                            ? thumbsSwiper
-                            : null,
-                      }}
-                      className="slider-images"
-                    >
-                      {photos &&
-                        photos.map((item, i) => (
-                          <SwiperSlide
-                            key={i}
-                            //  onClick={() => showPhoto(item)}
-                          >
-                            <ViewImage src={item} alt={""}/>
-                          </SwiperSlide>
-                        ))}
-                    </Swiper>
+                <div>
+                  <div className="nickname">
+                    {userDetail.displayName}
+                    <span>
+                      <img src={images.girl} alt="age" />
+                      20
+                    </span>
                   </div>
-                  {photos.length > 1 && (
-                    <div className="thumbs-swiper">
-                      <button className="btn-navigation prev-photos">
-                        <FaAngleLeft />
-                      </button>
+                  <div className="id">
+                    <img src={images.id} alt="" />
+                    <span>{userDetail.username}</span>
+                    <button
+                      onClick={() => {
+                        toast.success("Id copied!");
+                        copyToClipboard(userDetail.username);
+                      }}
+                    >
+                      <FaRegCopy />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {params.userId !== login.userInfo?.id && (
+                <div className="follow">
+                  {followStatus ? (
+                    <button
+                      onClick={handleUpdateUserFollowing}
+                      className="following"
+                    >
+                      <FaUserCheck />
+                      Following
+                    </button>
+                  ) : (
+                    <button onClick={handleUpdateUserFollowing}>
+                      <FaUserPlus />
+                      Follow
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="user-body">
+              <div className="row no-gutters">
+                <div className="body-left col l-4 c-12">
+                  <div className="photos">
+                    <div className="main-photo">
                       <Swiper
-                        onSwiper={setThumbsSwiper}
-                        modules={[Thumbs, Navigation]}
                         loop
-                        navigation={{
-                          nextEl: ".next-photos",
-                          prevEl: ".prev-photos",
+                        modules={[Thumbs, Navigation]}
+                        slidesPerView={1}
+                        spaceBetween={0}
+                        thumbs={{
+                          swiper:
+                            thumbsSwiper && !thumbsSwiper.destroyed
+                              ? thumbsSwiper
+                              : null,
                         }}
-                        slidesPerGroup={4}
-                        breakpoints={{
-                          100: {
-                            slidesPerView: 4,
-                            spaceBetween: 8,
-                          },
-                          1000: {
-                            slidesPerView: 4,
-                            spaceBetween: 8,
-                          },
-                        }}
-                        className="slider-thumbs"
+                        className="slider-images"
                       >
                         {photos &&
                           photos.map((item, i) => (
-                            <SwiperSlide key={i}>
-                              <div className="photo">
-                                <img src={item} alt="images" />
-                              </div>
+                            <SwiperSlide
+                              key={i}
+                              //  onClick={() => showPhoto(item)}
+                            >
+                              <ViewImage src={item} alt={""} />
                             </SwiperSlide>
                           ))}
                       </Swiper>
-                      <button className="btn-navigation next-photos">
-                        <FaAngleRight />
-                      </button>
                     </div>
-                  )}
+                    {photos.length > 1 && (
+                      <div className="thumbs-swiper">
+                        <button className="btn-navigation prev-photos">
+                          <FaAngleLeft />
+                        </button>
+                        <Swiper
+                          onSwiper={setThumbsSwiper}
+                          modules={[Thumbs, Navigation]}
+                          loop
+                          navigation={{
+                            nextEl: ".next-photos",
+                            prevEl: ".prev-photos",
+                          }}
+                          slidesPerGroup={4}
+                          breakpoints={{
+                            100: {
+                              slidesPerView: 4,
+                              spaceBetween: 8,
+                            },
+                            1000: {
+                              slidesPerView: 4,
+                              spaceBetween: 8,
+                            },
+                          }}
+                          className="slider-thumbs"
+                        >
+                          {photos &&
+                            photos.map((item, i) => (
+                              <SwiperSlide key={i}>
+                                <div className="photo">
+                                  <img src={item} alt="images" />
+                                </div>
+                              </SwiperSlide>
+                            ))}
+                        </Swiper>
+                        <button className="btn-navigation next-photos">
+                          <FaAngleRight />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="bio">
+                    <h2>Bio</h2>
+                    <p>{userDetail.bio}</p>
+                  </div>
                 </div>
-                <div className="bio">
-                  <h2>Bio</h2>
-                  <p>{userDetail.bio}</p>
-                </div>
-              </div>
-              <div className="body-right col l-8 c-12">
-                <div className="content">
-                  <Tabs skills={userDetail.skills} />
-                  <div className="user-review"></div>
+                <div className="body-right col l-8 c-12">
+                  <div className="content">
+                    <Tabs skills={userDetail.skills} />
+                    <div className="user-review"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </PageAnimate>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
+  .back {
+    position: fixed;
+    color: #333;
+    font-size: 20px;
+    left: 5px;
+    top: 5px;
+    z-index: 99999;
+  }
   .user-header {
-    margin-top: 100px;
     background-color: var(--white-color);
     border-radius: 14px;
-    display: flex;
     justify-content: space-between;
     padding: 12px;
+    position: relative;
+    margin-top: 10px;
     .header-left {
       display: flex;
       align-items: center;
+
       .header-avatar {
         margin-right: 18px;
         img {
@@ -238,22 +264,23 @@ const Wrapper = styled.div`
         }
       }
       .nickname {
-        font-size: 20px;
+        font-size: 18px;
         color: #333;
         font-weight: 700;
-        display: flex;
-        align-items: center;
         margin-bottom: 6px;
+        display: flex;
 
         span {
           background-color: #ff70a2;
           color: var(--white-color);
           font-size: 10px;
           display: flex;
+          height: 16px;
           align-items: center;
           border-radius: 4px;
-          padding: 0 2px;
+          padding: 0 5px;
           margin-left: 10px;
+          margin-top: 6px;
           img {
             width: 10px;
             height: 10px;
@@ -286,10 +313,12 @@ const Wrapper = styled.div`
     .follow {
       display: flex;
       align-items: center;
-
-      .following{
-        border: 2px solid var(--success-color);
-        svg{
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      .following {
+        border: 1px solid var(--success-color);
+        svg {
           color: var(--success-color);
         }
       }
@@ -297,18 +326,18 @@ const Wrapper = styled.div`
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 20px;
-        height: 40px;
-        padding: 0 8px;
-        font-size: 16px;
+        border-radius: 15px;
+        height: 30px;
+        padding: 0 6px;
+        font-size: 13px;
         font-weight: 400;
         color: #4f5a69;
         border: 1px solid #4f5a69;
 
         svg {
-          margin: 6px;
-          width: 22px;
-          height: 22px;
+          margin-right: 6px;
+          width: 16px;
+          height: 16px;
         }
       }
     }
@@ -370,7 +399,6 @@ const Wrapper = styled.div`
       }
     }
     .bio {
-      min-height: 300px;
       margin-top: 30px;
       padding: 20px;
       h2 {
@@ -387,8 +415,8 @@ const Wrapper = styled.div`
     }
 
     .body-right {
+      margin-top: 20px;
       .content {
-        margin-left: 20px;
       }
     }
   }

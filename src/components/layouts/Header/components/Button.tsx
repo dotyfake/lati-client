@@ -114,7 +114,6 @@ const Button = (props: Props) => {
         contentLabel="Example Modal"
         shouldCloseOnOverlayClick={true}
         ariaHideApp={false}
-        className = "animate__animated animate__rubberBand animate__fadeOut"
         style={{
           content: {
             top: "50%",
@@ -131,25 +130,25 @@ const Button = (props: Props) => {
         }}
       >
         <StyledModal>
-          <img src={images.logo} alt="logo" className="logo" />
-          <button className="close" onClick={closeModal}>
-            <FaTimes />
-          </button>
-            <div className="form-header">
-              <button
-                onClick={setLoginForm}
-                className={form === "login" ? "active" : ""}
-              >
-                Login
-              </button>
-              <button
-                onClick={setRegisterForm}
-                className={form === "register" ? "active" : ""}
-              >
-                Register
-              </button>
-            </div>
-            {form === "login" ? <LoginForm/> : <RegisterForm/>}
+            <img src={images.logo} alt="logo" className="logo" />
+            <button className="close" onClick={closeModal}>
+              <FaTimes />
+            </button>
+              <div className="form-header">
+                <button
+                  onClick={setLoginForm}
+                  className={form === "login" ? "active" : ""}
+                >
+                  Login
+                </button>
+                <button
+                  onClick={setRegisterForm}
+                  className={form === "register" ? "active" : ""}
+                >
+                  Register
+                </button>
+              </div>
+              {form === "login" ? <LoginForm/> : <RegisterForm/>}
         </StyledModal>
       </Modal>
     </Wrapper>

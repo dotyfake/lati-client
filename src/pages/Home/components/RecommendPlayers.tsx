@@ -1,9 +1,10 @@
-import React from "react";
 import styled from "styled-components";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { useGetSkillsQuery } from "redux/skills/skillsSlice";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
+import {CloudinaryImage} from '@cloudinary/url-gen'
+import {Resize} from '@cloudinary/url-gen/actions/resize';
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
@@ -142,7 +143,7 @@ const RecommendPlayers = (props: Props) => {
     "Skeleton-5",
   ]);
 
-  const { data, isLoading, isFetching } = useGetSkillsQuery({
+  const { data, isFetching } = useGetSkillsQuery({
     slug: props.slug,
   });
 
@@ -200,13 +201,22 @@ const RecommendPlayers = (props: Props) => {
                   </Player>
                 </SwiperSlide>
               ))
-            : listPlayer.map((player, i) => (
-                <SwiperSlide key={i}>
+            : listPlayer.map((player, i) => {
+              let result
+              if(player.avatarUrl){
+                let str = player.avatarUrl.replace('https', 'http');
+                let position = 49;
+                let sub = "w_206,h_258,c_fill/";
+  
+                result = str.slice(0, position )  + sub + str.slice(position) ;
+              }
+              
+             return (<SwiperSlide key={i}>
                   <Link to={`/user/${player.userId}`}>
                     <Player>
                       <div className="player">
                         <div className="image">
-                          <img src={player.avatarUrl} alt={player.name} />
+                          <img src={result} alt={player.name} />
                         </div>
                         <div className="info">
                           <p className="nickname">{player.nickname}</p>
@@ -219,8 +229,9 @@ const RecommendPlayers = (props: Props) => {
                       </div>
                     </Player>
                   </Link>
-                </SwiperSlide>
-              ))}
+                </SwiperSlide>)
+              
+            })}
         </Swiper>
       </div>
     </Wrapper>

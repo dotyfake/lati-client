@@ -5,6 +5,7 @@ import { useAuth } from "utils/hooks";
 import { Link } from "react-router-dom";
 import Search from './components/Search';
 import { useState } from "react";
+import Coins from "./components/Coins";
 type Props = {};
 
 
@@ -40,16 +41,12 @@ const Header = (props: Props) => {
             {showSearchInput ? <Search /> : <button onClick={()=> setShowSearchInput(true)}>
               <img src={images.search} alt="search" className="w-6 h-6" />
             </button>}
-            
-          {/* <div className="add-coin">
-            <img src={images.coin} alt="coin" />
-            <span>0</span>
-            <img src={images.coin} alt="add coin" />
-          </div>
+          {/* 
           <button className="chat">
-            <img src={images.chat} alt="chat" />
-          </button> */}
+          <img src={images.chat} alt="chat" />
+        </button> */}
           <QRCode />
+          <Coins />
           {isAuth ? <User /> :<Button />}
           
         </div>

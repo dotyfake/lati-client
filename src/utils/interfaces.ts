@@ -1,6 +1,7 @@
 import { CommentType } from './../pages/Posts/components/ListComment';
 
 export interface GameType {
+    _id?: string;
     name: string;
     slug: string;
     title?: string;
@@ -10,6 +11,7 @@ export interface GameType {
     brickIcon?: string;
     brickMini?: string;
     bannerUrl: string;
+    mainIconUrl: string;
 
 }
 
