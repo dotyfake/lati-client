@@ -10,10 +10,8 @@ export interface ListGameState {
   }
   
 
-const listGame: GameType[] | [] = [];
-
 const initialState: ListGameState = {
-  listGame: listGame,
+  listGame: [],
   loading: false,
   error: null,
 };

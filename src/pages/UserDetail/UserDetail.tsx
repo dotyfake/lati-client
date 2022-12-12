@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Tabs from "./components/Tabs";
 import { copyToClipboard } from "utils/copyToClipboard";
+import ViewImage from "components/ViewImage";
 
 //redux
 import { UserInfo, setUserInfo } from "redux/user/loginSlice";
@@ -40,7 +41,7 @@ const UserDetail = (props: Props) => {
 
   const { data: dataUserDetail } = useGetUserQuery(userId as string);
 
-  const [updateUserFollowing, { data: dataUserFollowing, isLoading }] =
+  const [updateUserFollowing, { data: dataUserFollowing }] =
     useUpdateUserFollowingMutation();
 
 
@@ -113,7 +114,7 @@ const UserDetail = (props: Props) => {
                 </div>
               </div>
             </div>
-            <div className="follow">
+            {params.userId !== login.userInfo?.id && <div className="follow">
               {followStatus ? (
                 <button onClick={handleUpdateUserFollowing} className="following">
                   <FaUserCheck />
@@ -125,7 +126,7 @@ const UserDetail = (props: Props) => {
                   Follow
                 </button>
               )}
-            </div>
+            </div>}
           </div>
           <div className="user-body">
             <div className="row no-gutters">
@@ -151,7 +152,7 @@ const UserDetail = (props: Props) => {
                             key={i}
                             //  onClick={() => showPhoto(item)}
                           >
-                            <img src={item} alt="images" />
+                            <ViewImage src={item} alt={""}/>
                           </SwiperSlide>
                         ))}
                     </Swiper>

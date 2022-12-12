@@ -20,6 +20,11 @@ const images = {
     player: require('./player.png'),
     follow: require('./follow.png'),
     following: require('./following.png'),
+    star: require('./star.png'),
+    more: require('./more.png'),
+    posts: require('./posts.png'),
+    home: require('./home.png'),
+    profile: require('./profile.png'),
     bunnySad: require('./bunny-sad.gif'),
 };
 

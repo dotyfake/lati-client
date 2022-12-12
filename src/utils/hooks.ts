@@ -1,4 +1,5 @@
 import { useAppSelector } from 'app/hooks';
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 export const useViewport = () => {
@@ -34,5 +35,12 @@ export function useDebounce<T>(value: T, delay?: number): T {
     return debouncedValue
   }
 
-
+  export const useOnlineUsers = (userId: string) => {
+    const { login } = useAppSelector(state => state);
+    if(login.onlineUsers){
+      
+      const isOnlineUser = login.onlineUsers.some(user => user.userId === userId);
+      return isOnlineUser
+    }
+};
 

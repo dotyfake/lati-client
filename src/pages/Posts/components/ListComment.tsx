@@ -30,6 +30,8 @@ const ListComment = (props: Props) => {
   const { login } = useAppSelector((state) => state);
   const isAuth = useAuth()
 
+  
+
 
   const [createComment, { data: dataComments }] = useCreateCommentMutation();
 
@@ -60,7 +62,7 @@ const ListComment = (props: Props) => {
   return (
     <Wrapper>
       <div className="list-comment">
-        <input
+        {isAuth &&<input
           className="input-comment"
           type="text"
           placeholder="Write a comment..."
@@ -69,7 +71,7 @@ const ListComment = (props: Props) => {
           onChange={(e) => {
             setInputCommentValue(e.target.value);
           }}
-        ></input>
+        ></input>}
         {comments &&
           comments.map((comment, i) => (
             <div key={i}>
@@ -102,7 +104,7 @@ const ListComment = (props: Props) => {
 
 const Wrapper = styled.div`
   .list-comment {
-    margin: 20px 62px 0;
+    margin: 20px 0;
     .input-comment {
       width: 100%;
       height: 40px;

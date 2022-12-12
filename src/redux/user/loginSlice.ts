@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { setError } from 'utils/error';
 import { PostType } from 'utils/interfaces';
 import axiosPublic from '../../utils/axiosPublic';
+import { Socket } from 'socket.io-client';
 
 type User = {
   username: string;
@@ -30,15 +31,20 @@ export interface UserInfo {
 
 export interface UserSliceState {
   userInfo?: UserInfo | null;
+  onlineUsers?: [{userId: string, socketId: string}] | [];
+  showAuthForm?: any;
   loading: boolean;
   error: null | any;
+
 }
 
 export const initialState: UserSliceState = {
   userInfo: null,
+  onlineUsers: [],
+  showAuthForm: null,
   loading: false,
   error: null,
-};
+}
 
 export const userLogin = createAsyncThunk(
   'auth/login',
@@ -67,6 +73,12 @@ export const loginSlice = createSlice({
     setUserInfo: (state: UserSliceState, action: PayloadAction<UserInfo>) => {
       state.userInfo = action.payload;
     },
+    setShowAuthForm: (state: UserSliceState, action: PayloadAction<any>) => {
+      state.showAuthForm = action.payload;
+    },
+    setOnlineUsers: (state: UserSliceState, action: PayloadAction<[{userId: string, socketId: string}]>) => {
+      state.onlineUsers = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(userLogin.pending, (state) => {
@@ -83,6 +95,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { userLogout, setUserInfo } = loginSlice.actions;
+export const { userLogout, setUserInfo, setOnlineUsers, setShowAuthForm } = loginSlice.actions;
 
 export default loginSlice;

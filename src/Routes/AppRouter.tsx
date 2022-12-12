@@ -1,3 +1,5 @@
+
+
 import {
   Route,
   createBrowserRouter,
@@ -19,6 +21,8 @@ import {
   PrivatePage,
   Root,
 } from "components";
+
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,7 +53,11 @@ const router = createBrowserRouter(
         <Route
           path="/posts/following"
           element={
-            <DefaultLayout sidebar={<PostSidebar />} content={<PostsFollowing />} />
+            <DefaultLayout sidebar={<PostSidebar />} content={
+              <PrivatePage>
+              <PostsFollowing />
+            </PrivatePage>
+            } />
           }
           errorElement={<ErrorPage />}
         />
@@ -57,7 +65,7 @@ const router = createBrowserRouter(
       <Route
         path="/account"
         element={
-          <PrivatePage>
+          <PrivatePage >
             <Account />
           </PrivatePage>
         }

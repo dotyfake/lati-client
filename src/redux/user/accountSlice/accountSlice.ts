@@ -2,8 +2,15 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const accountApi = createApi({
   reducerPath: 'accountApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://lati-server.onrender.com/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_PUBLIC_URL_HTTPS}/api` }),
   endpoints: (builder) => ({
+    getFollowingUser: builder.mutation({
+        query: (accessToken) => ({
+            url: `/account/getFollowingUser`,
+            method: 'GET',
+            headers: {Authorization: `Bearer ${accessToken}`,},
+      }),
+    }),
     updateUser: builder.mutation({
         query: (payload) => ({
             url: `/account/updateUser`,
@@ -23,4 +30,4 @@ export const accountApi = createApi({
 })
 
 
-export const { useUpdateUserMutation, useUpdateUserFollowingMutation } = accountApi
+export const { useUpdateUserMutation, useUpdateUserFollowingMutation, useGetFollowingUserMutation } = accountApi

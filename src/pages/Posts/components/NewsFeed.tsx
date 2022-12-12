@@ -1,78 +1,51 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { FaPaperPlane, FaComment, FaHeart } from "react-icons/fa";
 
 //components
-import { LoadingIcon, InfiniteScroll } from "components";
+import { InfiniteScroll, LoadingIcon, PageAnimate } from "components";
 
 //redux
-import {
-  useUpdateLikeMutation,
-} from "redux/posts/postSlice";
-import { useAppSelector, useAppDispatch } from "app/hooks";
-import { setUserInfo } from "redux/user/loginSlice";
-import { useUpdateUserFollowingMutation } from "redux/user/accountSlice/accountSlice";
+import { useAppSelector } from "app/hooks";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-import { Link, useParams } from "react-router-dom";
 import Sad from "components/layouts/Header/components/Sad";
-import ListComment, { CommentType } from "./ListComment";
+import { useParams } from "react-router-dom";
 
-import { useAuth } from "utils/hooks";
 import axiosPublic from "utils/axiosPublic";
+import { useAuth, useViewport } from "utils/hooks";
 import { PostType } from "utils/interfaces";
+import Post from "./Post";
 
 type Props = {
   newPost: PostType | undefined;
   fetchPostType: 'following' | 'profile' | 'newPosts';
   noMarginTop?: boolean;
+  isMobile?: boolean
 };
+
+interface StyledWrapperType {
+  noMarginTop?: boolean,
+  isMobile?: boolean
+}
+
+
 
 const NewsFeed = (props: Props) => {
   const { login } = useAppSelector((state) => state);
 
-  const dispatch = useAppDispatch();
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
-  const [showComments, setShowComments] = useState(false);
   const [listPost, setListPost] = useState<PostType[] | []>([])
   const isAuth = useAuth();
   const newPost = props.newPost;
   const param = useParams();
 
-  const [updateLike, { data: dataLike, isSuccess }] = useUpdateLikeMutation();
+  const viewPort = useViewport();
+  const isMobile = viewPort.width <= 765;
 
-  const [updateUserFollowing, { data: dataUserFollowing, isLoading }] =
-  useUpdateUserFollowingMutation();
-
-const handleUpdateUserFollowing = (post : PostType) => {
-  const action = login.userInfo?.following.includes(post.user._id) ? "unfollow" : "follow";
-  
-  if (login.userInfo)
-    updateUserFollowing({
-      accessToken: login.userInfo?.accessToken,
-      action: action,
-      followingUserId: post.user._id,
-    });
-};
-
-
-  const handleUpdateLike = (postId: string, postUserId: string) => {
-    if (login.userInfo && isAuth) {
-      const userId = login.userInfo?.id;
-      updateLike({
-        accessToken: login.userInfo?.accessToken,
-        postId: postId,
-        postUserId,
-        isLiked: !!listPost.find(
-          (post) => post._id === postId && post.like?.includes(userId)
-        ),
-      });
-    }
-  };
 
   useEffect(()=> {
     const getPosts = async () => {
@@ -81,7 +54,7 @@ const handleUpdateUserFollowing = (post : PostType) => {
           page: page,
           following: props.fetchPostType === 'following' ? login.userInfo?.id : undefined,
           profile: props.fetchPostType === 'profile' ? param.userId : undefined,
-          newPosts: props.fetchPostType === 'newPosts' ? login.userInfo?.id : undefined,
+          newPosts: props.fetchPostType === 'newPosts' ? true : undefined,
         }
       })
       if(res.data){
@@ -92,177 +65,83 @@ const handleUpdateUserFollowing = (post : PostType) => {
     getPosts()
   },[page])
 
-  useEffect(() => {
-    if (login.userInfo)
-      dispatch(
-        setUserInfo({ ...login.userInfo, ...dataUserFollowing})
-      );
-  }, [dataUserFollowing]);
 
   useEffect(() => {
     if (newPost)
-    setListPost([newPost, ...listPost] as [PostType])
+    {
+    setListPost([newPost].concat(listPost))
+  }
   }, [newPost]);
-
-
-  useEffect(() => {
-    if (dataLike) {
-      const newPosts = listPost.map((post) => {
-        if (post._id === dataLike.postId) {
-          post = { ...post, like: dataLike.like };
-        }
-        return post;
-      });
-      setListPost(newPosts)
-    }
-  }, [dataLike]);
-
+ 
   return (
-    <Wrapper >
-      <div className="posts wide-m">
-        <div className="news-feed">
-          {listPost.length > 0 ? (
-            <InfiniteScroll
-              loader={
-                <div className="flex justify-center">
-                  <LoadingIcon />
-                </div>
-              }
-              fetchMore={() => setPage((prev) => prev + 1)}
-              hasMore={listPost.length < totalRows}
-              endMessage={<Sad content="You have seen it all!" />}
-            >
-              {listPost.map((post, index) => {
-                const date = new Date(post.createdAt);
-                const dateTime = date.toLocaleTimeString("en-us", {
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  weekday: "long",
-                  year: "numeric",
-                  month: "short",
-                });
-                return (
+    <Wrapper noMarginTop = {props.noMarginTop} isMobile = {isMobile}>
+      <PageAnimate>
+        <div className="posts wide-m">
+          <div className="news-feed">
+            {listPost.length > 0 ? (
+              <InfiniteScroll
+                loader={
+                  <div className="flex justify-center">
+                    <LoadingIcon />
+                  </div>
+                }
+                fetchMore={() => setPage((prev) => prev + 1)}
+                hasMore={listPost.length < totalRows}
+                endMessage={<Sad content="You have seen it all!" />}
+              >
+                {listPost.map((post) =>
+                   <Post postData = {post} key = {post._id}/>
+                )}
+              </InfiniteScroll>
+            ) : (
+              Array(5)
+                .fill(0)
+                .map((item, index) => (
                   <div className="post" key={index}>
                     <div className="post-header">
-                      <div className="info-post">
-                        <Link to={`/user/${post.user._id}`}>
-                          <img
-                            className="avatar"
-                            src={post.user.avatar.avatarUrl}
-                            alt=""
-                          />
-                        </Link>
-                        <div className="post-name-time">
-                          <Link to={`/user/${post.user._id}`}>
-                            <div className="name">{post.user.displayName}</div>
-                          </Link>
-                          <div className="time">{dateTime}</div>
-                        </div>
+                      <Skeleton className="avatar" />
+                      <div className="post-name-time">
+                        <Skeleton width={160}></Skeleton>
+                        <Skeleton width={120}></Skeleton>
                       </div>
-                      {post.user._id !== login.userInfo?.id && <div className="follow">
-                        {!login.userInfo?.following.includes(post.user._id) ? (
-                          <button className="btn-follow animate__animated animate__fadeInanimate__fadeOut" onClick={()=> handleUpdateUserFollowing(post)}>
-                             <span>Follow</span>
-                          </button>
-                        ) : (
-                          <button className="btn-following animate__animated animate__fadeInanimate__fadeOut" onClick={()=> handleUpdateUserFollowing(post)}>
-                            <span>Following</span>
-                          </button>
-                        )}
-                      </div>}
                     </div>
                     <div className="post-body">
-                      <p className="post-content">{post.content}</p>
-                      {post.photo.photoUrl && (
-                        <div className="photo">
-                          <img
-                            className="image"
-                            src={post.photo.photoUrl}
-                            alt=""
-                          />
-                        </div>
-                      )}
-                      <div className="reaction">
-                        <button
-                          className={
-                            login.userInfo &&
-                            post.like.includes(login.userInfo?.id)
-                              ? "btn-reaction like liked animate__animated animate__rubberBand"
-                              : "btn-reaction like"
-                          }
-                          onClick={() =>
-                            handleUpdateLike(post._id, post.user._id)
-                          }
-                        >
-                          <FaHeart />
-                          {`${post.like.length}`}
-                        </button>
-                        <button
-                          className="btn-reaction comments"
-                          onClick={() => setShowComments((prev) => !prev)}
-                        >
-                          <FaComment />
-                          {`${post.comments.length}`}
-                        </button>
-                        <button className="btn-reaction chat">
-                          <FaPaperPlane /> Chat
-                        </button>
-                      </div>
-                      <ListComment postId={post._id} comments={post.comments} />
-                    </div>
-                  </div>
-                );
-              })}
-            </InfiniteScroll>
-          ) : (
-            Array(5)
-              .fill(0)
-              .map((item, index) => (
-                <div className="post" key={index}>
-                  <div className="post-header">
-                    <Skeleton className="avatar" />
-                    <div className="post-name-time">
-                      <Skeleton width={160}></Skeleton>
-                      <Skeleton width={120}></Skeleton>
-                    </div>
-                  </div>
-                  <div className="post-body">
-                    <Skeleton
-                      className="post-content"
-                      width={"80%"}
-                      height={30}
-                    />
-                    <div className="photo">
-                      <Skeleton className="image" />
-                    </div>
-                    <div className="reaction">
                       <Skeleton
-                        width={200}
+                        className="post-content"
+                        width={"80%"}
                         height={30}
-                        className="btn-reaction"
-                      ></Skeleton>
+                      />
+                      <div className="photo">
+                        <Skeleton className="image" />
+                      </div>
+                      <div className="reaction">
+                        <Skeleton
+                          width={200}
+                          height={30}
+                          className="btn-reaction"
+                        ></Skeleton>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-          )}
+                ))
+            )}
+          </div>
         </div>
-      </div>
+      </PageAnimate>
     </Wrapper>
   );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<StyledWrapperType>`
   .posts {
-    background-color: var(--white-color);
-    margin: calc(var(--header-height) + 20px) auto 0;
-    padding: 18px;
-    border-radius: 4px;
-
+    margin: 0 auto;
+    margin-top: ${props => props.noMarginTop ? '20px' : '50px'};
+    
     .post {
-      padding: 20px;
+      background-color: var(--white-color);
       margin: 0 auto 20px;
+      border-radius: 4px;
+      padding: 12px;
       .post-header {
         display: flex;
         justify-content: space-between;
@@ -297,27 +176,27 @@ const Wrapper = styled.div`
        }
       }
       .post-body {
+        .post-group{
+          width: ${props => props.isMobile ? '100%' : '540px'};
+          margin: 0 auto;
+        }
         .post-content {
           font-size: 14px;
           font-weight: 500;
-          margin: 12px 56px;
+          margin: 12px 0;
         }
         .photo {
-          display: flex;
-          justify-content: center;
           .image {
-            width: 90vw;
-            max-width: 540px;
-            height: 540px;
+            width: ${props => props.isMobile ? '100%' : '540px'};
+            height: ${props => props.isMobile ? '330px' : '540px'};
             object-position: center;
             object-fit: cover;
-            border-radius: 12px;
-            margin: 0 auto;
+            border-radius: ${props => props.isMobile ? '6px' : '12px'};
           }
         }
         .reaction {
           display: flex;
-          margin: 10px 56px;
+          margin: 12px 0;
           .btn-reaction {
             display: flex;
             margin-right: 18px;

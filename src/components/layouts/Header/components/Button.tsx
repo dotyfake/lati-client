@@ -1,10 +1,12 @@
 import images from "assets/images";
 import styled from "styled-components";
 import Modal from "react-modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import { useAppDispatch } from "app/hooks";
+import { setShowAuthForm } from "redux/user/loginSlice";
 
 
 type Props = {};
@@ -21,7 +23,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const StyledModal = styled.div`
+export const StyledModal = styled.div`
   padding: 5px 20px;
   position: relative;
   z-index: 10000;
@@ -79,6 +81,7 @@ const StyledModal = styled.div`
 const Button = (props: Props) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState<"login" | "register">("login");
+  const dispatch = useAppDispatch();
 
   //Change login/register form
   function setLoginForm(e: any) {
@@ -99,6 +102,10 @@ const Button = (props: Props) => {
   function closeModal() {
     setIsOpen(false);
   }
+
+  useEffect(() => {
+    dispatch(setShowAuthForm(openModal))
+  },[])
   return (
     <Wrapper>
       <button
@@ -130,25 +137,25 @@ const Button = (props: Props) => {
         }}
       >
         <StyledModal>
-          <img src={images.logo} alt="logo" className="logo" />
-          <button className="close" onClick={closeModal}>
-            <FaTimes />
-          </button>
-            <div className="form-header">
-              <button
-                onClick={setLoginForm}
-                className={form === "login" ? "active" : ""}
-              >
-                Login
-              </button>
-              <button
-                onClick={setRegisterForm}
-                className={form === "register" ? "active" : ""}
-              >
-                Register
-              </button>
-            </div>
-            {form === "login" ? <LoginForm/> : <RegisterForm/>}
+            <img src={images.logo} alt="logo" className="logo" />
+            <button className="close" onClick={closeModal}>
+              <FaTimes />
+            </button>
+              <div className="form-header">
+                <button
+                  onClick={setLoginForm}
+                  className={form === "login" ? "active" : ""}
+                >
+                  Login
+                </button>
+                <button
+                  onClick={setRegisterForm}
+                  className={form === "register" ? "active" : ""}
+                >
+                  Register
+                </button>
+              </div>
+              {form === "login" ? <LoginForm/> : <RegisterForm/>}
         </StyledModal>
       </Modal>
     </Wrapper>

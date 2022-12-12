@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from 'react'
-import { DefaultTheme, StyledComponent } from 'styled-components';
+import React, { useEffect, useRef } from 'react';
 
 type Props = {
     children: React.ReactNode;

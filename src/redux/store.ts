@@ -4,16 +4,20 @@ import storage from 'redux-persist/es/storage';
 import listGameSlice from './games/listGameSlice';
 import loginSlice from './user/loginSlice';
 import postsSlice from './posts/postsSlice';
+import chatSlice from './chat/chatSlice';
 import { accountApi } from './user/accountSlice/accountSlice';
 import { skillsApi } from './skills/skillsSlice';
 import { postsApi } from './posts/postSlice';
 import { userApi } from './user/userDetailSlice';
+import { chatApi } from './chat/chatApi';
 
 const reducers = combineReducers({
 listGame: listGameSlice.reducer,
 login: loginSlice.reducer,
 posts: postsSlice.reducer,
+chat: chatSlice.reducer,
 [userApi.reducerPath]: userApi.reducer,
+[chatApi.reducerPath]: chatApi.reducer,
 [accountApi.reducerPath]: accountApi.reducer,
 [skillsApi.reducerPath]: skillsApi.reducer,
 [postsApi.reducerPath]: postsApi.reducer,
@@ -22,7 +26,7 @@ posts: postsSlice.reducer,
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['skillsApi','userApi','postsApi','accountApi', 'posts'],
+  blacklist: ['skillsApi','userApi','postsApi','accountApi','chatApi', 'posts'],
 };
 const persistedReducer = persistReducer(persistConfig, reducers);
 

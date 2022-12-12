@@ -9,6 +9,7 @@ import * as yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { userLogin } from "redux/user/loginSlice";
 import LoadingIcon from "components/Loading/LoadingIcon";
+import { redirect, useNavigate } from "react-router-dom";
 type Props = {};
 
 type FormTypes = {
@@ -23,6 +24,7 @@ const schema = yup.object().shape({
 
 const LoginForm = (props: Props) => {
   const { login } = useAppSelector(state => state);
+  const navigate = useNavigate()
 
   const dispatch = useAppDispatch();
 
@@ -34,6 +36,7 @@ const LoginForm = (props: Props) => {
 
   function handleLogin(payload: FormTypes) {
     dispatch(userLogin(payload));
+    navigate('/')
   }
   return (
     <StyledForm>

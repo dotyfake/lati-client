@@ -9,19 +9,23 @@ import './style/grid.css'
 import 'animate.css';
 import { PersistGate } from 'redux-persist/integration/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
+import { BrowserRouter as Router } from 'react-router-dom';
+
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate persistor={persistor} >
-        <SkeletonTheme baseColor="#eeecec" highlightColor="#cfcdcd">
-          <App />
-        </SkeletonTheme>
-      </PersistGate>
-    </Provider>
+    <Router>
+      <Provider store={store}>
+        <PersistGate persistor={persistor} >
+          <SkeletonTheme baseColor="#eeecec" highlightColor="#cfcdcd">
+            <App />
+          </SkeletonTheme>
+        </PersistGate>
+      </Provider>
+    </Router>
   </React.StrictMode>
 );
 

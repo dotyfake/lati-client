@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useGetSkillsQuery } from "redux/skills/skillsSlice";
@@ -124,77 +124,79 @@ const SkillPage = (props: Props) => {
 
   return (
     <Wrapper>
-      {skills.length === 0 ? (
-        <div className="skills-header">
-          <Skeleton width={44} height={44} />
-          <div className="title">
-            <Skeleton width={260} height={30} />
+      <div className="skills-page" >
+        {skills.length === 0 ? (
+          <div className="skills-header">
+            <Skeleton width={44} height={44} />
+            <div className="title">
+              <Skeleton width={260} height={30} />
+            </div>
           </div>
+        ) : (
+          <div className="skills-header">
+            <div className="icon">
+              <img src={skills[0].iconUrl} alt={skills[0].name} />
+            </div>
+            <div className="title">{skills[0].name}</div>
+          </div>
+        )}
+        
+             {skills.length === 0 ? <div className="skills-body">
+        <div className="row">
+          {Array(10).fill(0).map((item, index)=> <div key={index} className="skill col l-6 c-12">
+            <div className="skill-body">
+              <div className="skill-left">
+                <Skeleton width={204} height={204}/>
+              </div>
+              <div className="skill-right">
+                <div className="nickname">
+                <Skeleton width={160} height={40}/>
+                </div>
+                <div className="intro">
+                <Skeleton width={220} height={40}/>
+                </div>
+                <div className="price">
+                <Skeleton width={120} height={40}/>
+                </div>
+              </div>
+            </div>
+          </div>)}
         </div>
-      ) : (
-        <div className="skills-header">
-          <div className="icon">
-            <img src={skills[0].iconUrl} alt={skills[0].name} />
-          </div>
-          <div className="title">{skills[0].name}</div>
-        </div>
-      )}
-
-     {skills.length === 0 ? <div className="skills-body">
-      <div className="row">
-        {Array(10).fill(0).map((item, index)=> <div key={index} className="skill col l-6 c-12">
-          <div className="skill-body">
-            <div className="skill-left">
-              <Skeleton width={204} height={204}/>
-            </div>
-            <div className="skill-right">
-              <div className="nickname">
-              <Skeleton width={160} height={40}/>
+             </div> : <div className="skills-body">
+          <InfiniteScroll
+            loader={
+              <div className="flex justify-center">
+                <LoadingIcon />
               </div>
-              <div className="intro">
-              <Skeleton width={220} height={40}/>
-              </div>
-              <div className="price">
-              <Skeleton width={120} height={40}/>
-              </div>
-            </div>
-          </div>
-        </div>)}
-      </div>
-     </div> : <div className="skills-body">
-        <InfiniteScroll
-          loader={
-            <div className="flex justify-center">
-              <LoadingIcon />
-            </div>
-          }
-          fetchMore={() => setPage((prev) => prev + 1)}
-          hasMore={skills.length < totalRows}
-          endMessage={<EndMessage>You have seen it all</EndMessage>}
-        >
-          <div className="row">
-            {skills.map((skill, index) => (
-              <div className="skill col l-6 c-12" key={index}>
-                <Link to={`/user/${skill.userId}`}>
-                  <div className="skill-body">
-                    <div className="skill-left">
-                      <img src={skill.avatarUrl} alt="avatar" />
-                    </div>
-                    <div className="skill-right">
-                      <div className="nickname">{skill.nickname}</div>
-                      <div className="intro">{skill.intro}</div>
-                      <div className="price">
-                        <img src={images.coin} alt="coin" />
-                        <span>{skill.price}</span>/Trận
+            }
+            fetchMore={() => setPage((prev) => prev + 1)}
+            hasMore={skills.length < totalRows}
+            endMessage={<EndMessage>You have seen it all</EndMessage>}
+          >
+            <div className="row">
+              {skills.map((skill, index) => (
+                <div className="skill col l-6 c-12" key={index}>
+                  <Link to={`/user/${skill.userId}`}>
+                    <div className="skill-body">
+                      <div className="skill-left">
+                        <img src={skill.avatarUrl} alt="avatar" />
+                      </div>
+                      <div className="skill-right">
+                        <div className="nickname">{skill.nickname}</div>
+                        <div className="intro">{skill.intro}</div>
+                        <div className="price">
+                          <img src={images.coin} alt="coin" />
+                          <span>{skill.price}</span>/Trận
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </InfiniteScroll>
-      </div>}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </InfiniteScroll>
+        </div>}
+      </div>
     </Wrapper>
   );
 };

@@ -1,12 +1,13 @@
-import React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+
 import StyledForm from "./StyledForm";
-import { useAppSelector, useAppDispatch } from "app/hooks";
+import { useAppDispatch } from "app/hooks";
 import { userRegister } from "redux/user/registerSlice";
 import images from "assets/images";
-import { useState } from "react";
+import { redirect, useNavigate } from "react-router-dom";
 
 type Props = {};
 
@@ -42,6 +43,7 @@ const schema = yup.object().shape({
 
 const RegisterForm = (props: Props) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
 
   const [formState, setFormState] = useState<FormTypes>({
     username: "",
@@ -67,6 +69,8 @@ const RegisterForm = (props: Props) => {
     };
 
     dispatch(userRegister(newPayload));
+    navigate('/')
+
   }
   return (
     <StyledForm>
