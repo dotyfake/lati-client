@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const postsApi = createApi({
   reducerPath: 'postsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3000/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.PUBLIC_URL_HTTPS}/api` }),
   endpoints: (builder) => ({
     getPosts: builder.query<any, { page?: number; limit?: number, following?: string, profile?: string, newPosts?: string}>({
         query: (payload) => ({

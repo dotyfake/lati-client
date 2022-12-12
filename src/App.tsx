@@ -1,20 +1,7 @@
+import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { Routes, Route } from "react-router-dom";
 import { useAuth, useViewport } from "utils/hooks";
 
-import {
-  Home,
-  PostsNew,
-  PostsFollowing,
-  ErrorPage,
-  Account,
-  SkillPage,
-  SkillPageMobile,
-  UserDetail,
-  UserDetailMobile,
-  HomeMobile,
-  Chat,
-} from "pages/index";
 import {
   DefaultLayout,
   Games,
@@ -22,21 +9,26 @@ import {
   PostsMobileLayout,
   PrivatePage,
   Root,
-  RootMobile,
+  RootMobile
 } from "components";
+import {
+  Account, Chat, ErrorPage, Home, HomeMobile, PostsFollowing, PostsNew, SkillPage,
+  SkillPageMobile,
+  UserDetail,
+  UserDetailMobile
+} from "pages/index";
 
-import "react-toastify/dist/ReactToastify.css";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import Auth from "components/layouts/Auth";
+import Sad from "components/layouts/Header/components/Sad";
 import AccountMobile from "pages/Account/AccountMobile";
 import ChatBox from "pages/Chat/components/ChatBox";
-import Sad from "components/layouts/Header/components/Sad";
-import ChatSidebarMobile from "pages/Chat/components/ChatSidebarMobile";
 import ChatBoxMobile from "pages/Chat/components/ChatBoxMobile";
-import { io, Socket } from 'socket.io-client';
-import { useEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "app/hooks";
+import ChatSidebarMobile from "pages/Chat/components/ChatSidebarMobile";
+import { useEffect, useRef } from "react";
+import "react-toastify/dist/ReactToastify.css";
 import { setOnlineUsers } from "redux/user/loginSlice";
-import Auth from "components/layouts/Auth";
-import StyledForm from "components/layouts/Header/components/StyledForm";
+import { io, Socket } from 'socket.io-client';
 
 function App() {
   const { login} = useAppSelector((state) => state)
@@ -48,7 +40,7 @@ function App() {
 
   useEffect(() => {
     if(isAuth){
-      socket.current = io("ws://localhost:8800");
+      socket.current = io(`ws://${process.env.BASE_URL}:8800`);
       socket.current.emit("new-user-add", login.userInfo?.id);
       socket.current.on("get-users", (users: [{userId: string, socketId: string}]) => {
         dispatch(setOnlineUsers(users));

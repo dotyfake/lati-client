@@ -84,7 +84,7 @@ const ChatBox = (props: Props) => {
     setListMessage([]);
 
 
-    socket.current = io("ws://localhost:8800");
+    socket.current = io(`ws://${process.env.BASE_URL}:8800`);
     socket.current.emit("join-room", login.onlineUsers?.find(user => user.userId === login.userInfo?.id)?.socketId);
 
   }, [params.userId]);

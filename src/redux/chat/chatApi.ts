@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const chatApi = createApi({
   reducerPath: 'chatApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3000/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.PUBLIC_URL_HTTPS}/api` }),
   endpoints: (builder) => ({
     getChatId: builder.mutation({
         query: (payload) => ({
