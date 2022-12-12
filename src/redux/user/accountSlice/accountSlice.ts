@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const accountApi = createApi({
   reducerPath: 'accountApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.PUBLIC_URL_HTTPS}/api` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_PUBLIC_URL_HTTPS}/api` }),
   endpoints: (builder) => ({
     getFollowingUser: builder.mutation({
         query: (accessToken) => ({
