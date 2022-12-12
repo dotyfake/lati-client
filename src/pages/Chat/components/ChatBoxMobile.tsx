@@ -84,7 +84,7 @@ const ChatBoxMobile = (props: Props) => {
     setListMessage([]);
 
 
-    socket.current = io(`ws://${process.env.REACT_APP_BASE_URL}:8800`);
+    socket.current = io(`${process.env.REACT_APP_BASE_URL_HTTPS}:8800`);
     socket.current.emit("join-room", login.onlineUsers?.find(user => user.userId === login.userInfo?.id)?.socketId);
 
   }, [params.userId]);
