@@ -186,7 +186,7 @@ const RecommendPlayers = (props: Props) => {
           modules={[Navigation]}
           className="mySwiper"
         >
-          {isFetching
+          {data
             ? listPlayer.map((player, i) => (
                 <SwiperSlide key={i}>
                   <Player>
