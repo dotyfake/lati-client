@@ -15,6 +15,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { getListGame } from "redux/games/listGameSlice";
 import MoreGame from "./components/mobile/MoreGame";
 import { AnimatePresence } from "framer-motion";
+import { Button } from "components/layouts/Header/components";
 type Props = {};
 
 const tabs = [
@@ -52,6 +53,7 @@ const HomeMobile = (props: Props) => {
 
   return (
       <Wrapper >
+        <div style={{display: 'none'}}><Button /></div>
         <HeaderMobile />
     <PageAnimate>
         <div className="container wide">

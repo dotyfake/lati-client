@@ -8,20 +8,22 @@ import axiosPublic from "../../../../utils/axiosPublic";
 import LoadingIcon from "components/Loading/LoadingIcon";
 import { Link } from "react-router-dom";
 
-type Props = {};
+type Props = {
+  type?: "chat" | "default";
+};
 
 type UserType = {
-    username: string;
-    displayName: string;
-    bio: string;
-    avatar: any;
-    _id: string;
+  username: string;
+  displayName: string;
+  bio: string;
+  avatar: any;
+  _id: string;
 };
 
 const Search = (props: Props) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [hasResultBox, setHasResultBox] = useState(true);
-  const [searchResult, setSearchResult] = useState<UserType[]>([])
+  const [searchResult, setSearchResult] = useState<UserType[]>([]);
   const inputRef = useRef<HTMLInputElement>();
   const debouncedValue = useDebounce<string>(searchValue, 700);
 
@@ -41,7 +43,7 @@ const Search = (props: Props) => {
     const getUsers = async () => {
       if (searchValue.length > 1) {
         const res = await axiosPublic.get(`/search?payload=${searchValue}`);
-        setSearchResult(res.data)
+        setSearchResult(res.data);
       }
     };
     getUsers();
@@ -49,8 +51,8 @@ const Search = (props: Props) => {
 
   useEffect(() => {
     if (searchValue.length > 1) {
-        setHasResultBox(true)
-      }
+      setHasResultBox(true);
+    }
   }, [searchValue]);
 
   return (
@@ -59,27 +61,37 @@ const Search = (props: Props) => {
         visible={hasResultBox}
         onClickOutside={() => setHasResultBox(false)}
         interactive={true}
+        placement={'bottom'}
         render={(attrs) => (
           <div className="result-box shadow-lg">
-            {searchResult ? searchResult.map((user,i)=> <Link key = {i} to = {`/user/${user._id}`} onClick = {()=> setHasResultBox(false)}>
-                <div className="user" >
-              <div className="avatar">
-                <img
-                  src={user.avatar.avatarUrl}
-                  alt=""
-                />
-              </div>
-              <div className="info">
-                <div className="name">
-                  {user.displayName}
-                  <span className="id">ID: {user.username}</span>
-                </div>
-                <p className="bio">
-                  {user.bio}
-                </p>
-              </div>
-            </div></Link>) : <LoadingIcon />}
-            
+            {searchResult ? (
+              searchResult.map((user) => (
+                <Link
+                  key={user._id}
+                  to={
+                    props.type === "chat"
+                      ? `/chat/${user._id}`
+                      : `/user/${user._id}`
+                  }
+                  onClick={() => setHasResultBox(false)}
+                >
+                  <div className="user">
+                    <div className="avatar">
+                      <img src={user.avatar.avatarUrl} alt="" />
+                    </div>
+                    <div className="info">
+                      <div className="name">
+                        {user.displayName}
+                        <span className="id">ID: {user.username}</span>
+                      </div>
+                      <p className="bio">{user.bio}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <LoadingIcon />
+            )}
           </div>
         )}
       >
@@ -145,14 +157,15 @@ const Wrapper = styled.div`
     max-height: 320px;
     overflow-x: hidden;
     overflow-y: auto;
-    
+    z-index: 2000;
+
     .user {
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-        transition: all 0.4s;
-        padding: 8px;
-        background-color: var(--white-color);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      transition: all 0.4s;
+      padding: 8px;
+      background-color: var(--white-color);
 
       .avatar {
         img {
@@ -189,23 +202,23 @@ const Wrapper = styled.div`
         }
       }
       &:hover {
-      background-color: #f9f9f9;
-    }
+        background-color: #f9f9f9;
+      }
     }
 
     &::-webkit-scrollbar {
-        width: 6px;
-      }
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: #8b5cf6;
-        border-radius: 6px;
-      }
-      &::-webkit-scrollbar-thumb:hover {
-        background: #7c4bf0;
-      }
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #8b5cf6;
+      border-radius: 6px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #7c4bf0;
+    }
   }
 `;
 

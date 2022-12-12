@@ -1,24 +1,20 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 import {
-  FaRegEdit,
-  FaPhotoVideo,
-  FaTimesCircle,
-  FaTimes,
+  FaPhotoVideo, FaRegEdit, FaTimes
 } from "react-icons/fa";
 
 //redux
-import { useAppSelector, useAppDispatch } from "app/hooks";
+import { useAppDispatch, useAppSelector } from "app/hooks";
 import { useCreatePostMutation } from "redux/posts/postSlice";
-import { setUserInfo } from 'redux/user/loginSlice';
 
 //tippyjs
 import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import Uploading from "components/Loading/Uploading";
+import "tippy.js/dist/tippy.css";
 import { useAuth } from "utils/hooks";
 
 import { PostType } from 'utils/interfaces';
@@ -29,7 +25,6 @@ type Props = {
 
 const CreatePost = (props: Props) => {
   const { login } = useAppSelector((state) => state);
-  const dispatch = useAppDispatch()
   const [previewPhoto, setPreviewPhoto] = useState("");
   const [contentPost, setContentPost] = useState("");
   const [showCreatePostModal, setShowCreatePostModal] =
@@ -65,8 +60,6 @@ const CreatePost = (props: Props) => {
   
   useEffect(() => {
     if (login.userInfo && data){
-      const currentPosts = [...login.userInfo?.posts, data.post as PostType];
-      dispatch(setUserInfo({...login.userInfo, posts: currentPosts}))
       props.newPost(data.post)
     }
     setShowCreatePostModal(false);
@@ -218,23 +211,18 @@ const ModalStyled = styled.div`
 
         .remove {
           position: absolute;
-          display: none;
+          display: block;
           top: 10px;
           right: 10px;
           color: var(--white-color);
           font-size: 30px;
+          filter: brightness(2);
 
           &:hover {
             color: var(--primary-color);
           }
         }
 
-        &:hover {
-          .remove {
-            display: block;
-            filter: brightness(2);
-          }
-        }
       }
 
       .add-photo {

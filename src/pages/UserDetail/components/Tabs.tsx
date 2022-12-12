@@ -12,6 +12,7 @@ import "swiper/css/navigation";
 import { SkillType } from "utils/interfaces";
 import images from 'assets/images';
 import NewsFeed from 'pages/Posts/components/NewsFeed';
+import { Link, useParams } from 'react-router-dom';
 
 type Props = {
   skills: SkillType[];
@@ -24,6 +25,8 @@ const Tabs = (props: Props) => {
   const setCurrentTab = (e: React.MouseEvent<HTMLElement>) => {
     setTabActive((e.target as Element).innerHTML);
   };
+
+  const params = useParams()
 
   useEffect(()=> {
     if(!currentSkill)
@@ -100,9 +103,11 @@ const Tabs = (props: Props) => {
             </p>
             <div className="buttons">
               <button className="btn order">Order</button>
-              <button className="btn chat">
-                  <img src={images.chatEmo} alt="chat" />
-                  Chat</button>
+              <Link to= {`/chat/${params.userId}`}>
+                <button className="btn chat">
+                    <img src={images.chatEmo} alt="chat" />
+                    Chat</button>
+              </Link>
             </div>
           </div>
       </div>}

@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useDeleteSkillMutation, useEditSkillMutation } from "../skillsSlice";
 import { setUserInfo, UserInfo } from 'redux/user/loginSlice';
 import { useAppDispatch,useAppSelector } from 'app/hooks';
+import { useViewport } from "utils/hooks";
 
 type Props = {
   skill: SkillType;
@@ -19,8 +20,12 @@ type EditSkillType = {
   price: number;
 };
 
-const Wrapper = styled.div`
-  display: flex;
+type StyledType = {
+  isMobile?: boolean
+}
+
+const Wrapper = styled.div<StyledType>`
+  display: ${props => props.isMobile ? 'block' : 'flex'};
   justify-content: space-between;
   align-items: center;
   padding: 10px;
@@ -56,7 +61,7 @@ const Wrapper = styled.div`
       width: 100px;
     }
     .content-top {
-      display: flex;
+      display: ${props => props.isMobile ? 'block' : 'flex'};
       .content-item {
         display: flex;
         align-items: center;
@@ -91,6 +96,7 @@ const Wrapper = styled.div`
 
   .controls {
     width: 60px;
+    margin-left: auto;
     img {
       width: 26px;
     }
@@ -116,6 +122,7 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 10px;
     .save-skill {
       display: flex;
       align-items: center;
@@ -145,6 +152,10 @@ const {login} = useAppSelector(state => state)
     price: props.skill.price,
   });
   const dispatch = useAppDispatch()
+
+  const viewPort = useViewport();
+  const isMobile = viewPort.width <= 765;
+
   const [editSkill, {isSuccess : editSkillSuccess, data: editSkillData}] = useEditSkillMutation();
 
   const [deleteSkill, {isSuccess : deleteSkillSuccess, data: deleteSkillData}] = useDeleteSkillMutation();
@@ -189,7 +200,7 @@ const {login} = useAppSelector(state => state)
   }, [deleteSkillData, deleteSkillSuccess]);
 
   return (
-    <Wrapper>
+    <Wrapper isMobile = {isMobile}>
       <div className="content">
         <div className="content-top">
           <div className="content-item name">

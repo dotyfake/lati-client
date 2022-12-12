@@ -1,6 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import { Routes, Route } from "react-router-dom";
-import { useViewport } from "utils/hooks";
+import { useAuth, useViewport } from "utils/hooks";
 
 import {
   Home,
@@ -13,41 +13,63 @@ import {
   UserDetail,
   UserDetailMobile,
   HomeMobile,
+  Chat,
 } from "pages/index";
 import {
   DefaultLayout,
   Games,
-  PageAnimate,
   PostSidebar,
+  PostsMobileLayout,
   PrivatePage,
   Root,
   RootMobile,
 } from "components";
 
 import "react-toastify/dist/ReactToastify.css";
+import AccountMobile from "pages/Account/AccountMobile";
+import ChatBox from "pages/Chat/components/ChatBox";
+import Sad from "components/layouts/Header/components/Sad";
+import ChatSidebarMobile from "pages/Chat/components/ChatSidebarMobile";
+import ChatBoxMobile from "pages/Chat/components/ChatBoxMobile";
+import { io, Socket } from 'socket.io-client';
+import { useEffect, useRef, useState } from "react";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { setOnlineUsers } from "redux/user/loginSlice";
+import Auth from "components/layouts/Auth";
+import StyledForm from "components/layouts/Header/components/StyledForm";
 
 function App() {
+  const { login} = useAppSelector((state) => state)
+  const dispatch = useAppDispatch()
   const viewPort = useViewport();
   const isMobile = viewPort.width <= 765;
+  const socket = useRef<Socket>();
+  const isAuth = useAuth();
+
+  useEffect(() => {
+    if(isAuth){
+      socket.current = io("ws://localhost:8800");
+      socket.current.emit("new-user-add", login.userInfo?.id);
+      socket.current.on("get-users", (users: [{userId: string, socketId: string}]) => {
+        dispatch(setOnlineUsers(users));
+      });
+    }
+  }, [login.userInfo]);
 
   return (
     <div className="App">
       {isMobile ? (
         //Mobile Router
-        <Routes >
+        <Routes>
           <Route path="/" element={<RootMobile />}>
             <Route
               index
-              element={
-                  <HomeMobile />
-            }
+              element={<HomeMobile />}
               errorElement={<ErrorPage />}
             />
             <Route
               path="/skill/:slug"
-              element={
-                  <SkillPageMobile  />
-              }
+              element={<SkillPageMobile />}
               errorElement={<ErrorPage />}
             />
             <Route
@@ -59,24 +81,20 @@ function App() {
               <Route
                 path="/posts/new"
                 element={
-                  <DefaultLayout
-                    sidebar={<PostSidebar />}
-                    content={<PostsNew />}
-                  />
+                    <PostsMobileLayout>
+                      <PostsNew />
+                    </PostsMobileLayout>
                 }
                 errorElement={<ErrorPage />}
               />
               <Route
                 path="/posts/following"
                 element={
-                  <DefaultLayout
-                    sidebar={<PostSidebar />}
-                    content={
-                      <PrivatePage>
-                        <PostsFollowing />
-                      </PrivatePage>
-                    }
-                  />
+                  <PrivatePage>
+                    <PostsMobileLayout>
+                      <PostsFollowing />
+                    </PostsMobileLayout>
+                  </PrivatePage>
                 }
                 errorElement={<ErrorPage />}
               />
@@ -85,11 +103,34 @@ function App() {
               path="/account"
               element={
                 <PrivatePage>
-                  <Account />
+                  <AccountMobile />
                 </PrivatePage>
               }
             />
+            <Route
+              path="/auth"
+              element={
+                  <Auth />
+              }
+            />
           </Route>
+          <Route
+              path="/chat"
+              element={
+                <PrivatePage>
+                  <ChatSidebarMobile />
+                </PrivatePage>
+              }
+            >
+            </Route>
+              <Route
+                path="/chat/:userId"
+                element={
+                  <PrivatePage>
+                    <ChatBoxMobile />
+                  </PrivatePage>
+                }
+              />
         </Routes>
       ) : (
         //PC Router
@@ -146,6 +187,23 @@ function App() {
                 </PrivatePage>
               }
             />
+            <Route
+              path="/chat"
+              element={
+                <PrivatePage>
+                  <Chat chatBox = {<Sad content = 'Please click to left side chat'/>}/>
+                </PrivatePage>
+              }
+            >
+            </Route>
+              <Route
+                path="/chat/:userId"
+                element={
+                  <PrivatePage>
+                    <Chat chatBox = {<ChatBox />}/>
+                  </PrivatePage>
+                }
+              />
           </Route>
         </Routes>
       )}

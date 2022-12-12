@@ -44,6 +44,29 @@ export interface PostType {
     userId: string
    };
 }
+export interface FollowingUserType {
+    _id: string;
+    avatar: {avatarUrl: string};
+    displayName: string;
+}
+export interface ChatType {
+    chatId: string;
+    receiver: {
+        _id: string;
+        displayName: string;
+        avatar: {avatarUrl: string};
+    };
+    createdAt: string;
+    updatedAt: string;
+}
+export interface MessageType {
+    _id?:string;
+    chatId: string;
+    senderId: string;
+    text: string;
+    createdAt: string;
+    updatedAt?: string;
+}
 
 export interface GamesType {
     games: {

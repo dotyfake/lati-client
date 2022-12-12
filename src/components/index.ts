@@ -13,3 +13,4 @@ export { default as PageAnimate} from './PageAnimate';
 export { default as PrivatePage } from './PrivatePage';
 export { default as PostSidebar } from './layouts/Sidebar/PostSidebar';
 export { default as DefaultLayout } from './layouts/DefaultLayout/DefaultLayout';
+export { default as PostsMobileLayout } from './layouts/PostsMobileLayout/PostsMobileLayout';

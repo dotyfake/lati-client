@@ -7,6 +7,7 @@ import StyledForm from "./StyledForm";
 import { useAppDispatch } from "app/hooks";
 import { userRegister } from "redux/user/registerSlice";
 import images from "assets/images";
+import { redirect, useNavigate } from "react-router-dom";
 
 type Props = {};
 
@@ -42,6 +43,7 @@ const schema = yup.object().shape({
 
 const RegisterForm = (props: Props) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
 
   const [formState, setFormState] = useState<FormTypes>({
     username: "",
@@ -67,6 +69,8 @@ const RegisterForm = (props: Props) => {
     };
 
     dispatch(userRegister(newPayload));
+    navigate('/')
+
   }
   return (
     <StyledForm>

@@ -6,8 +6,14 @@ import { useAppSelector, useAppDispatch } from "app/hooks";
 import { setUserInfo } from "redux/user/loginSlice";
 import { LoadingIcon } from "components/index";
 import { toast } from "react-toastify";
+import { useViewport } from "utils/hooks";
 type Props = {};
-const Wrapper = styled.div`
+
+type StyledType = {
+  isMobile?: boolean
+};
+
+const Wrapper = styled.div<StyledType>`
   h2 {
     font-size: 1.4rem;
     margin-left: 20px;
@@ -36,10 +42,11 @@ const Wrapper = styled.div`
       align-items: center;
       background-color: #f8f8f8;
       border-radius: 14px;
-      height: 210px;
+      height: ${props => props.isMobile ? '150px' : '210px' };
       cursor: pointer;
       overflow: hidden;
       margin-top: 12px;
+      box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 
       &:hover {
         filter: brightness(0.9);
@@ -82,6 +89,9 @@ const Photos = (props: Props) => {
 
   const [valueFileInput, setValueFileInput] = useState("");
   const [uploading, setUploading] = useState<boolean>(false);
+
+  const viewPort = useViewport();
+  const isMobile = viewPort.width <= 765;
 
 
   const handleFileInputChange = async (
@@ -158,7 +168,7 @@ const Photos = (props: Props) => {
     }
   };
   return (
-    <Wrapper>
+    <Wrapper isMobile = {isMobile}>
       <h2>Photos</h2>
       <div className="photos">
         <div className="row sm-gutter">

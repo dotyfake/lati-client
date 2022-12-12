@@ -35,29 +35,12 @@ export function useDebounce<T>(value: T, delay?: number): T {
     return debouncedValue
   }
 
-  export const useNavigatorOnLine = () => {
-    const getOnLineStatus = () =>
-  typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean'
-    ? navigator.onLine
-    : true;
-    
-    const [status, setStatus] = React.useState(getOnLineStatus());
-  
-    const setOnline = () => setStatus(true);
-    const setOffline = () => setStatus(false);
-  
-    React.useEffect(() => {
-      window.addEventListener('online', setOnline);
-      window.addEventListener('offline', setOffline);
-  
-      return () => {
-        window.removeEventListener('online', setOnline);
-        window.removeEventListener('offline', setOffline);
-      };
-    }, []);
-  
-    return status;
-  };
-
-
+  export const useOnlineUsers = (userId: string) => {
+    const { login } = useAppSelector(state => state);
+    if(login.onlineUsers){
+      
+      const isOnlineUser = login.onlineUsers.some(user => user.userId === userId);
+      return isOnlineUser
+    }
+};
 

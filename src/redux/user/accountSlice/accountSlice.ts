@@ -4,6 +4,13 @@ export const accountApi = createApi({
   reducerPath: 'accountApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3000/api/' }),
   endpoints: (builder) => ({
+    getFollowingUser: builder.mutation({
+        query: (accessToken) => ({
+            url: `/account/getFollowingUser`,
+            method: 'GET',
+            headers: {Authorization: `Bearer ${accessToken}`,},
+      }),
+    }),
     updateUser: builder.mutation({
         query: (payload) => ({
             url: `/account/updateUser`,
@@ -23,4 +30,4 @@ export const accountApi = createApi({
 })
 
 
-export const { useUpdateUserMutation, useUpdateUserFollowingMutation } = accountApi
+export const { useUpdateUserMutation, useUpdateUserFollowingMutation, useGetFollowingUserMutation } = accountApi
