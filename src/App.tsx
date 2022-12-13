@@ -40,7 +40,7 @@ function App() {
 
   useEffect(() => {
     if(isAuth){
-      socket.current = io(`ws://${process.env.BASE_URL}:8800`);
+      socket.current = io(`https://lati-server.onrender.com:8800`, {secure: true});
       socket.current.emit("new-user-add", login.userInfo?.id);
       socket.current.on("get-users", (users: [{userId: string, socketId: string}]) => {
         dispatch(setOnlineUsers(users));

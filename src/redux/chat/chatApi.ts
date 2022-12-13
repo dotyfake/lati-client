@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const chatApi = createApi({
   reducerPath: 'chatApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_PUBLIC_URL_HTTPS}/api` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `https://lati-server.onrender.com/api` }),
   endpoints: (builder) => ({
     getChatId: builder.mutation({
         query: (payload) => ({
