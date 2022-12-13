@@ -84,7 +84,7 @@ const ChatBoxMobile = (props: Props) => {
     setListMessage([]);
 
 
-    socket.current = io(`https://lati-server.onrender.com`, {secure: true});
+    socket.current = io(`https://lati-server.onrender.com`, {transports: ['websocket'], upgrade:false, secure: true});
     socket.current.emit("join-room", login.onlineUsers?.find(user => user.userId === login.userInfo?.id)?.socketId);
 
   }, [params.userId]);
