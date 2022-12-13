@@ -53,7 +53,7 @@ const Header = (props: Props) => {
           )}
 
           <QRCode />
-          <Coins />
+          {isAuth && <Coins />}
           {isAuth && <button className="chat">
             <Link to="/chat">
               <img src={images.chat} alt="chat" />
