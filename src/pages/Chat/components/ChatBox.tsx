@@ -84,7 +84,7 @@ const ChatBox = (props: Props) => {
     setListMessage([]);
 
 
-    socket.current = io(`https://lati-server.onrender.com:8800`, {secure: true});
+    socket.current = io(`https://lati-server.onrender.com`, {secure: true});
     socket.current.emit("join-room", login.onlineUsers?.find(user => user.userId === login.userInfo?.id)?.socketId);
 
   }, [params.userId]);
