@@ -92,7 +92,7 @@ const ChatBoxMobile = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-    socket.current = io(`https://lati-server.onrender.com:1412`);
+    socket.current = io(`http://35.160.120.126:1412`);
   }, [params.userId]);
 
   useEffect(() => {
