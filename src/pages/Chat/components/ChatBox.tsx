@@ -100,11 +100,7 @@ const ChatBox = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-    socket.current = io(`http://localhost:8800`, {
-      transports: ["websocket"],
-      upgrade: false,
-      secure: true,
-    });
+    socket.current = io(`https://lati-server.onrender.com`);
   }, [params.userId]);
 
   useEffect(() => {

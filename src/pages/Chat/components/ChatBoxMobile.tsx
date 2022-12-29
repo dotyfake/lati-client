@@ -92,11 +92,7 @@ const ChatBoxMobile = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-    socket.current = io(`http://localhost:8800`, {
-      transports: ["websocket"],
-      upgrade: false,
-      secure: true,
-    });
+    socket.current = io(`https://lati-server.onrender.com`);
   }, [params.userId]);
 
   useEffect(() => {
@@ -175,9 +171,9 @@ const ChatBoxMobile = (props: Props) => {
         </div>
       </div>}
       <div className="chat-content">
-        {listMessage.map((message) => <div className={message.senderId === params.userId ? 'receiver' : 'sender'}>
+        {listMessage.map((message) => <div key = {message._id}  className={message.senderId === params.userId ? 'receiver' : 'sender'}>
         {message.senderId === params.userId && 
-        <div><AvatarChat
+        <div><AvatarChat 
         src={userData?.avatar.avatarUrl}
         size={34}
         id={userData?._id}
