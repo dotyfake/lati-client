@@ -44,7 +44,7 @@ function App() {
       firstRender.current = true
     } else {
       if(isAuth){
-        socket.current = io(`https://lati-server.onrender.com:8800`);
+        socket.current = io(`https://lati-server.onrender.com:1412`);
         socket.current.emit("new-user-add", login.userInfo?.id);
         socket.current.on("get-users", (users) => {
           dispatch(setOnlineUsers(users));
