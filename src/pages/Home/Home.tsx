@@ -20,7 +20,7 @@ const Home = (props: Props) => {
           <Banner />
           <SlideSkills />
           <div className="RecommendGroup">
-              {listGame.listGame.map((item, i) => <RecommendPlayers key= {i} slug = {item.slug} title = {item.name}/>)}
+              {listGame.listGame && listGame.listGame.map((item, i) => <RecommendPlayers key= {i} slug = {item.slug} title = {item.name}/>)}
           </div>
         </div>
     </Wrapper>

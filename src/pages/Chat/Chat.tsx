@@ -8,7 +8,6 @@ type Props = {
 
 const Chat = (props: Props) => {
 
-  
   return (
     <Wrapper>
       <div className="chat">

@@ -3,8 +3,6 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { useGetSkillsQuery } from "redux/skills/skillsSlice";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {CloudinaryImage} from '@cloudinary/url-gen'
-import {Resize} from '@cloudinary/url-gen/actions/resize';
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
@@ -14,10 +12,16 @@ import images from "assets/images";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { useAppSelector } from "app/hooks";
 
 type Props = {
   slug: string;
   title: string;
+};
+
+type OnlineType = {
+  userId: string; 
+  socketId: string;
 };
 
 const Wrapper = styled.div`
@@ -86,6 +90,7 @@ const Player = styled.div`
     border-radius: 14px;
     overflow: hidden;
     transition: all 0.4s;
+    position: relative;
     .image {
       overflow: hidden;
       img {
@@ -102,6 +107,19 @@ const Player = styled.div`
           transform: scale(1.2);
         }
       }
+    }
+
+    .status{
+      position: absolute;
+      top: 10px;
+      left: 4px;
+      border-radius: 20px;
+      background-color: #40d879;
+      padding: 0 5px;
+      color: #fff;
+      border: 2px solid #fff;
+      font-weight: 500;
+      font-size: 14px;
     }
   }
   .info {
@@ -135,6 +153,10 @@ const Player = styled.div`
 `;
 
 const RecommendPlayers = (props: Props) => {
+
+  const [onlineUser, setOnlineUser] = useState<OnlineType[] | []>([])
+  const {login} = useAppSelector(state => state)
+  
   const [listPlayer, setListPlayer] = useState<any[]>([
     "Skeleton-1",
     "Skeleton-2",
@@ -143,13 +165,21 @@ const RecommendPlayers = (props: Props) => {
     "Skeleton-5",
   ]);
 
-  const { data, isFetching } = useGetSkillsQuery({
+  const { data } = useGetSkillsQuery({
     slug: props.slug,
   });
+
+  const checkUserOnline = (userId: string) => {
+    onlineUser.some(user =>  user.userId === userId)
+  }
 
   useEffect(() => {
     if (data) setListPlayer(data.skills);
   }, [data]);
+
+  useEffect(() => {
+    login.onlineUsers && setOnlineUser(login.onlineUsers)
+  },[login.onlineUsers])
 
   if (!listPlayer) return <div></div>;
 
@@ -225,6 +255,9 @@ const RecommendPlayers = (props: Props) => {
                             <p>{player.price}</p>
                             <span>/Trận</span>
                           </div>
+                        </div>
+                        <div className="status">
+                        { onlineUser.some(user =>  user.userId === player.userId) ? 'Online' : null}
                         </div>
                       </div>
                     </Player>

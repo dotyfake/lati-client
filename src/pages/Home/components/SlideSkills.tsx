@@ -117,7 +117,7 @@ const SlideSkills = (props: Props) => {
             <div className="skeleton">
               <Skeleton width={142} height={142}/>
             </div>
-          </SwiperSlide>) : gameArray.map((game, i) => (
+          </SwiperSlide>) : gameArray && gameArray.map((game, i) => (
           <SwiperSlide key={i}>
             <Link to = {`/skill/${game.slug}`}>
               <div className="game">

@@ -27,7 +27,7 @@ import ChatBoxMobile from "pages/Chat/components/ChatBoxMobile";
 import ChatSidebarMobile from "pages/Chat/components/ChatSidebarMobile";
 import { useEffect, useRef } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import { setOnlineUsers } from "redux/user/loginSlice";
+import { setOnlineUsers, setSocket } from "redux/user/loginSlice";
 import { io, Socket } from 'socket.io-client';
 
 function App() {
@@ -36,17 +36,30 @@ function App() {
   const viewPort = useViewport();
   const isMobile = viewPort.width <= 765;
   const socket = useRef<Socket>();
+  const firstRender = useRef<boolean>()
   const isAuth = useAuth();
 
   useEffect(() => {
-    if(isAuth){
-      socket.current = io(`https://lati-server.onrender.com`, {transports: ['websocket'], upgrade:false, secure: true});
-      socket.current.emit("new-user-add", login.userInfo?.id);
+    if(!firstRender.current){
+      firstRender.current = true
+    } else {
+      if(isAuth){
+        socket.current = io(`http://localhost:8800`, {transports: ['websocket'], upgrade:false, secure: true});
+        socket.current.emit("new-user-add", login.userInfo?.id);
+        socket.current.on("get-users", (users) => {
+          dispatch(setOnlineUsers(users));
+        });
+      }
+    }
+  }, [login.userInfo]);
+
+  useEffect(() => {
+    if(socket.current){
       socket.current.on("get-users", (users: [{userId: string, socketId: string}]) => {
         dispatch(setOnlineUsers(users));
       });
     }
-  }, [login.userInfo]);
+  },[])
 
   return (
     <div className="App">

@@ -23,22 +23,22 @@ const ChatBoxMobile = (props: Props) => {
   const [showBoxEmoji, setShowBoxEmoji] = useState(false);
   const [message, setMessage] = useState("");
   const [listMessage, setListMessage] = useState<MessageType[] | []>([]);
-  const [chatId, setChatId] = useState("")
+  const [chatId, setChatId] = useState("");
 
   const params = useParams();
   const isUserOnline = useOnlineUsers(params.userId as string);
   const socket = useRef<Socket>();
-  
+
   const secondRender = useRef(false);
   const scroll = useRef<HTMLDivElement>(null);
 
-  const [getChatId, {data: chatIdData}] = useGetChatIdMutation()
+  const [getChatId, { data: chatIdData }] = useGetChatIdMutation();
   const [getChats, { data: dataChats }] = useGetChatsMutation();
   const [createChat, { data }] = useCreateChatMutation();
   const [sendMessage, { data: MessageData }] = useSendMessageMutation();
   const [getMessages, { data: MessagesData }] = useGetMessagesMutation();
-  const {data: userData} = useGetUserQuery(params.userId as string)
-  
+  const { data: userData } = useGetUserQuery(params.userId as string);
+
   const handleSetMessage = (emoji: { emoji: React.SetStateAction<string> }) =>
     setMessage((prev) => (prev += emoji.emoji));
 
@@ -46,33 +46,42 @@ const ChatBoxMobile = (props: Props) => {
     setShowBoxEmoji((prev) => !prev);
   };
   const handleSendMessage = () => {
-    if(message.length > 0 && userData) {
-      const mess = {chatId: chatId,
-        text: message, senderId: login.userInfo?.id, createdAt: Date.now()};
+    if (message.length > 0 && userData) {
+      const mess = {
+        chatId: chatId,
+        text: message,
+        senderId: login.userInfo?.id,
+        createdAt: Date.now(),
+      };
       sendMessage({
         accessToken: login.userInfo?.accessToken,
         chatId: chatId,
-        text: message
-      })
-      setListMessage([...listMessage, mess] as MessageType[])
+        text: message,
+      });
+      setListMessage([...listMessage, mess] as MessageType[]);
 
-        // Send Message to socket server\
-        if(socket.current){
-          socket.current.emit("send-message", {...mess,receiverId: params.userId});
-        }
+      // Send Message to socket server\
+      if (socket.current) {
+        socket.current.emit("send-message", {
+          ...mess,
+          receiverId: params.userId,
+        });
+      }
     }
-    setMessage('')
-  }
+    setMessage("");
+  };
 
-  const handleChangeInput = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleChangeInput = (e: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
     setMessage(e.target.value);
-  }
+  };
 
   const handleKeyDown = (e: any) => {
-    if(e.key === 'Enter') {
-      handleSendMessage()
+    if (e.key === "Enter") {
+      handleSendMessage();
     }
-  }
+  };
 
   useEffect(() => {
     if (secondRender.current) {
@@ -83,46 +92,64 @@ const ChatBoxMobile = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-
-    socket.current = io(`https://lati-server.onrender.com`, {transports: ['websocket'], upgrade:false, secure: true});
-    socket.current.emit("join-room", login.onlineUsers?.find(user => user.userId === login.userInfo?.id)?.socketId);
-
+    socket.current = io(`http://localhost:8800`, {
+      transports: ["websocket"],
+      upgrade: false,
+      secure: true,
+    });
   }, [params.userId]);
 
   useEffect(() => {
-    getChats(`${login.userInfo?.accessToken}`);
-    getChatId({accessToken: login.userInfo?.accessToken, receiverId: params.userId})
+    if (socket.current && chatId) {
+      socket.current.emit("join-room", login.userInfo?.id);
+    }
+
+  }, [chatId]);
+
+  useEffect(() => {
+    if (data) {
+      getChats(`${login.userInfo?.accessToken}`);
+      getChatId({
+        accessToken: login.userInfo?.accessToken,
+        receiverId: params.userId,
+      });
+    }
   }, [data]);
 
   useEffect(() => {
-    if(chatIdData && data){
-      setChatId(chatIdData.chatId._id)
-      getMessages({accessToken: login.userInfo?.accessToken, chatId: chatIdData.chatId._id})
+    if (chatIdData) {
+      setChatId(chatIdData.chatId._id);
+      getMessages({
+        accessToken: login.userInfo?.accessToken,
+        chatId: chatIdData.chatId._id,
+      });
     }
-  }, [chatIdData])
+  }, [chatIdData]);
 
-   // Always scroll to last Message
-   useEffect(()=> {
-    scroll.current?.scrollTo(0,scroll.current.scrollHeight)
-  },[listMessage])
+  // Always scroll to last Message
+  useEffect(() => {
+    scroll.current?.scrollTo(0, scroll.current.scrollHeight);
+  }, [listMessage]);
 
   useEffect(() => {
     if (dataChats) dispatch(setListChat(dataChats.listReceiver));
   }, [dataChats]);
 
   useEffect(() => {
-    if(MessagesData)
-    setListMessage(MessagesData.messages)
-  },[MessagesData])
+    if (MessagesData && listMessage.length === 0) {
+      setListMessage(MessagesData.messages);
+    }
+  }, [MessagesData]);
 
-// Get the message from socket server
-useEffect(() => {
- if(socket.current){
-  socket.current.on("receive-message", (mess) => {
-    setListMessage([...listMessage, mess] as MessageType[])
-  });
-}
-}, [MessageData]);
+  // Get the message from socket server
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("receive-message", (mess) => {
+        setListMessage([...listMessage, mess] as MessageType[]);
+      });
+    }
+  }, [MessageData]);
+
   return (
     <ChatBoxStyled>
       {userData ? <div className="chat-header">

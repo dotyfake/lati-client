@@ -26,9 +26,7 @@ const Games = (props: Props) => {
 
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (listGame.listGame.length < 1) {
       dispatch(getListGame());
-    }
   }, []);
   return (
     <Wrapper>
@@ -44,7 +42,7 @@ const Games = (props: Props) => {
             ))}
         </div>
       ) : (
-        listGame.listGame.map((item, index) => (
+        listGame.listGame && listGame.listGame.map((item, index) => (
           <SidebarItem key={index} listGame={item} />
         ))
       )}

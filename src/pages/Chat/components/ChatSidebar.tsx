@@ -91,6 +91,7 @@ const ChatSidebar = (props: Props) => {
         </div>
         <h2 className="title-chat">Chat</h2>
         <div className="list-chat">
+          {chat.listChat && chat.listChat?.length < 1 && <p style = {{textAlign: "center"}}>Please search or follow someone.</p>}
           {chat.listChat && chat.listChat.map((conversation) => (
               <Conversation key={conversation.chatId} data = {conversation}/>
             ))}

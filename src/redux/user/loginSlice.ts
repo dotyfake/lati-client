@@ -35,6 +35,7 @@ export interface UserSliceState {
   showAuthForm?: any;
   loading: boolean;
   error: null | any;
+  socket?: any;
 
 }
 
@@ -73,6 +74,9 @@ export const loginSlice = createSlice({
     setUserInfo: (state: UserSliceState, action: PayloadAction<UserInfo>) => {
       state.userInfo = action.payload;
     },
+    setSocket: (state: UserSliceState, action: PayloadAction<any>) => {
+      state.socket = action.payload;
+    },
     setShowAuthForm: (state: UserSliceState, action: PayloadAction<any>) => {
       state.showAuthForm = action.payload;
     },
@@ -95,6 +99,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { userLogout, setUserInfo, setOnlineUsers, setShowAuthForm } = loginSlice.actions;
+export const { userLogout, setUserInfo, setOnlineUsers, setShowAuthForm, setSocket } = loginSlice.actions;
 
 export default loginSlice;

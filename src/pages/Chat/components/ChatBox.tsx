@@ -4,15 +4,23 @@ import AvatarChat from "./AvatarChat";
 import { FaSmile } from "react-icons/fa";
 import EmojiPicker from "emoji-picker-react";
 import { useParams } from "react-router-dom";
-import { useSendMessageMutation, useCreateChatMutation, useGetChatsMutation, useGetChatIdMutation, useGetMessagesMutation } from "redux/chat/chatApi";
+import {
+  useSendMessageMutation,
+  useCreateChatMutation,
+  useGetChatsMutation,
+  useGetChatIdMutation,
+  useGetMessagesMutation,
+} from "redux/chat/chatApi";
+
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setListChat } from "redux/chat/chatSlice";
 import { useGetUserQuery } from "redux/user/userDetailSlice";
 import Skeleton from "react-loading-skeleton";
 import { MessageType } from "utils/interfaces";
-import {format} from 'timeago.js'
+import { format } from "timeago.js";
 import { useOnlineUsers } from "utils/hooks";
-import { io, Socket } from 'socket.io-client';
+import { io, Socket } from "socket.io-client";
+import { LoadingIcon } from "components/index";
 
 type Props = {};
 
@@ -23,22 +31,22 @@ const ChatBox = (props: Props) => {
   const [showBoxEmoji, setShowBoxEmoji] = useState(false);
   const [message, setMessage] = useState("");
   const [listMessage, setListMessage] = useState<MessageType[] | []>([]);
-  const [chatId, setChatId] = useState("")
+  const [chatId, setChatId] = useState("");
 
   const params = useParams();
   const isUserOnline = useOnlineUsers(params.userId as string);
   const socket = useRef<Socket>();
-  
+
   const secondRender = useRef(false);
   const scroll = useRef<HTMLDivElement>(null);
 
-  const [getChatId, {data: chatIdData}] = useGetChatIdMutation()
+  const [getChatId, { data: chatIdData }] = useGetChatIdMutation();
   const [getChats, { data: dataChats }] = useGetChatsMutation();
   const [createChat, { data }] = useCreateChatMutation();
   const [sendMessage, { data: MessageData }] = useSendMessageMutation();
   const [getMessages, { data: MessagesData }] = useGetMessagesMutation();
-  const {data: userData} = useGetUserQuery(params.userId as string)
-  
+  const { data: userData } = useGetUserQuery(params.userId as string);
+
   const handleSetMessage = (emoji: { emoji: React.SetStateAction<string> }) =>
     setMessage((prev) => (prev += emoji.emoji));
 
@@ -46,33 +54,42 @@ const ChatBox = (props: Props) => {
     setShowBoxEmoji((prev) => !prev);
   };
   const handleSendMessage = () => {
-    if(message.length > 0 && userData) {
-      const mess = {chatId: chatId,
-        text: message, senderId: login.userInfo?.id, createdAt: Date.now()};
+    if (message.length > 0 && userData) {
+      const mess = {
+        chatId: chatId,
+        text: message,
+        senderId: login.userInfo?.id,
+        createdAt: Date.now(),
+      };
       sendMessage({
         accessToken: login.userInfo?.accessToken,
         chatId: chatId,
-        text: message
-      })
-      setListMessage([...listMessage, mess] as MessageType[])
+        text: message,
+      });
+      setListMessage([...listMessage, mess] as MessageType[]);
 
-        // Send Message to socket server\
-        if(socket.current){
-          socket.current.emit("send-message", {...mess,receiverId: params.userId});
-        }
+      // Send Message to socket server\
+      if (socket.current) {
+        socket.current.emit("send-message", {
+          ...mess,
+          receiverId: params.userId,
+        });
+      }
     }
-    setMessage('')
-  }
+    setMessage("");
+  };
 
-  const handleChangeInput = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleChangeInput = (e: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
     setMessage(e.target.value);
-  }
+  };
 
   const handleKeyDown = (e: any) => {
-    if(e.key === 'Enter') {
-      handleSendMessage()
+    if (e.key === "Enter") {
+      handleSendMessage();
     }
-  }
+  };
 
   useEffect(() => {
     if (secondRender.current) {
@@ -83,78 +100,115 @@ const ChatBox = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-
-    socket.current = io(`https://lati-server.onrender.com`, {transports: ['websocket'], upgrade:false, secure: true});
-    socket.current.emit("join-room", login.onlineUsers?.find(user => user.userId === login.userInfo?.id)?.socketId);
-
+    socket.current = io(`http://localhost:8800`, {
+      transports: ["websocket"],
+      upgrade: false,
+      secure: true,
+    });
   }, [params.userId]);
 
   useEffect(() => {
-    getChats(`${login.userInfo?.accessToken}`);
-    getChatId({accessToken: login.userInfo?.accessToken, receiverId: params.userId})
+    if (socket.current && chatId) {
+      socket.current.emit("join-room", login.userInfo?.id);
+    }
+
+  }, [chatId]);
+
+  useEffect(() => {
+    if (data) {
+      getChats(`${login.userInfo?.accessToken}`);
+      getChatId({
+        accessToken: login.userInfo?.accessToken,
+        receiverId: params.userId,
+      });
+    }
   }, [data]);
 
   useEffect(() => {
-    if(chatIdData && data){
-      setChatId(chatIdData.chatId._id)
-      getMessages({accessToken: login.userInfo?.accessToken, chatId: chatIdData.chatId._id})
+    if (chatIdData) {
+      setChatId(chatIdData.chatId._id);
+      getMessages({
+        accessToken: login.userInfo?.accessToken,
+        chatId: chatIdData.chatId._id,
+      });
     }
-  }, [chatIdData])
+  }, [chatIdData]);
 
-   // Always scroll to last Message
-   useEffect(()=> {
-    scroll.current?.scrollTo(0,scroll.current.scrollHeight)
-  },[listMessage])
+  // Always scroll to last Message
+  useEffect(() => {
+    scroll.current?.scrollTo(0, scroll.current.scrollHeight);
+  }, [listMessage]);
 
   useEffect(() => {
     if (dataChats) dispatch(setListChat(dataChats.listReceiver));
   }, [dataChats]);
 
   useEffect(() => {
-    if(MessagesData)
-    setListMessage(MessagesData.messages)
-  },[MessagesData])
+    if (MessagesData && listMessage.length === 0) {
+      setListMessage(MessagesData.messages);
+    }
+  }, [MessagesData]);
 
-// Get the message from socket server
-useEffect(() => {
- if(socket.current){
-  socket.current.on("receive-message", (mess) => {
-    setListMessage([...listMessage, mess] as MessageType[])
-  });
-}
-}, [MessageData]);
+  // Get the message from socket server
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("receive-message", (mess) => {
+        setListMessage([...listMessage, mess] as MessageType[]);
+      });
+    }
+  }, [MessageData]);
+
   return (
     <ChatBoxStyled>
-      {userData ? <div className="chat-header">
-        <AvatarChat
-          src={userData?.avatar.avatarUrl}
-          id={userData?._id}
-        />
-        <div className="info">
-          <div className="name">{userData?.displayName}</div>
-          <div className="status" >{isUserOnline ? "Online" : "Offline"}</div>
-        </div>
-      </div> : <div className="chat-header">
-        <Skeleton circle width= {50} height= {50}/>
-        <div className="info">
-          <div className="name"><Skeleton /></div>
-          <div className="status"><Skeleton width= {70}/></div>
-        </div>
-      </div>}
-      <div className="chat-content" ref={scroll}>
-        {listMessage.map((message) => <div className={message.senderId === params.userId ? 'receiver' : 'sender'}>
-        {message.senderId === params.userId && 
-        <div><AvatarChat
-        src={userData?.avatar.avatarUrl}
-        size={46}
-        id={userData?._id}
-      /></div>}
-          <div className="text">
-          <p className="message"> {message.text}
-          </p>
-          <span>{format(message.createdAt)}</span>
+      {userData ? (
+        <div className="chat-header">
+          <AvatarChat src={userData?.avatar.avatarUrl} id={userData?._id} />
+          <div className="info">
+            <div className="name">{userData?.displayName}</div>
+            <div className="status">{isUserOnline ? "Online" : "Offline"}</div>
           </div>
-        </div>)}
+        </div>
+      ) : (
+        <div className="chat-header">
+          <Skeleton circle width={50} height={50} />
+          <div className="info">
+            <div className="name">
+              <Skeleton />
+            </div>
+            <div className="status">
+              <Skeleton width={70} />
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="chat-content" ref={scroll}>
+        {!MessagesData && (
+          <div className="loading">
+            <LoadingIcon />
+          </div>
+        )}
+        {listMessage.map((message) => (
+          <div
+            key={message._id}
+            className={
+              message.senderId === params.userId ? "receiver" : "sender"
+            }
+          >
+            {message.senderId === params.userId && (
+              <div>
+                <AvatarChat
+                  src={userData?.avatar.avatarUrl}
+                  size={46}
+                  id={userData?._id}
+                />
+              </div>
+            )}
+            <div className="text">
+              <p className="message"> {message.text}</p>
+              <span>{format(message.createdAt)}</span>
+            </div>
+          </div>
+        ))}
       </div>
       <div className="chat-footer">
         <div className="chat-input">
@@ -176,7 +230,9 @@ useEffect(() => {
             />
           </div>
         )}
-        <button className="send" onClick={handleSendMessage}>Send</button>
+        <button className="send" onClick={handleSendMessage}>
+          Send
+        </button>
       </div>
       {showBoxEmoji && (
         <div className="overlay" onClick={handleSetShowBoxEmoji}></div>
@@ -194,8 +250,8 @@ const ChatBoxStyled = styled.div`
     padding: 0 10px;
     position: relative;
 
-    &::before{
-      content: '';
+    &::before {
+      content: "";
       position: absolute;
       bottom: 0px;
       left: 80px;
@@ -227,12 +283,16 @@ const ChatBoxStyled = styled.div`
     overflow-y: scroll;
     overflow-x: hidden;
 
+    .loading {
+      display: flex;
+      justify-content: center;
+    }
 
     .sender {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 6px;
-      text-align:right;
+      text-align: right;
       p {
         display: inline-block;
         border-radius: 15px;
@@ -240,7 +300,7 @@ const ChatBoxStyled = styled.div`
         color: #fff;
         background-image: linear-gradient(90deg, #8b5cf6, #aa92df, #8b5cf6);
       }
-      span{ 
+      span {
         display: block;
         text-align: right;
         white-space: nowrap;
@@ -254,7 +314,7 @@ const ChatBoxStyled = styled.div`
     .receiver {
       margin-bottom: 6px;
       display: flex;
-      .text{
+      .text {
         margin-left: 10px;
         max-width: 250px;
       }
@@ -265,7 +325,7 @@ const ChatBoxStyled = styled.div`
         color: #fff;
         background-image: linear-gradient(90deg, #3b5fd4, #8284d4, #3b5fd4);
       }
-      span{ 
+      span {
         display: block;
         margin-top: 2px;
         margin-left: 10px;
