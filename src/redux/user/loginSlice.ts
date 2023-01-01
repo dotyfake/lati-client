@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 import { setError } from 'utils/error';
 import { PostType } from 'utils/interfaces';
 import axiosPublic from '../../utils/axiosPublic';
-import { Socket } from 'socket.io-client';
 
 type User = {
   username: string;

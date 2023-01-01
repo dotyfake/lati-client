@@ -13,10 +13,19 @@ import { MessageType } from "utils/interfaces";
 import {format} from 'timeago.js'
 import { useOnlineUsers } from "utils/hooks";
 import { io, Socket } from 'socket.io-client';
+import { LoadingIcon } from "components/index";
 
 type Props = {};
 
 const ChatBoxMobile = (props: Props) => {
+  const params = useParams();
+  const [getChatId, { data: chatIdData }] = useGetChatIdMutation();
+  const [getChats, { data: dataChats }] = useGetChatsMutation();
+  const [createChat, { data }] = useCreateChatMutation();
+  const [sendMessage, { data: MessageData }] = useSendMessageMutation();
+  const [getMessages, { data: MessagesData, isLoading }] = useGetMessagesMutation();
+  const { data: userData } = useGetUserQuery(params.userId as string);
+
   const { login } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
 
@@ -25,19 +34,13 @@ const ChatBoxMobile = (props: Props) => {
   const [listMessage, setListMessage] = useState<MessageType[] | []>([]);
   const [chatId, setChatId] = useState("");
 
-  const params = useParams();
   const isUserOnline = useOnlineUsers(params.userId as string);
   const socket = useRef<Socket>();
 
   const secondRender = useRef(false);
   const scroll = useRef<HTMLDivElement>(null);
 
-  const [getChatId, { data: chatIdData }] = useGetChatIdMutation();
-  const [getChats, { data: dataChats }] = useGetChatsMutation();
-  const [createChat, { data }] = useCreateChatMutation();
-  const [sendMessage, { data: MessageData }] = useSendMessageMutation();
-  const [getMessages, { data: MessagesData }] = useGetMessagesMutation();
-  const { data: userData } = useGetUserQuery(params.userId as string);
+
 
   const handleSetMessage = (emoji: { emoji: React.SetStateAction<string> }) =>
     setMessage((prev) => (prev += emoji.emoji));
@@ -92,7 +95,7 @@ const ChatBoxMobile = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-    socket.current = io(`http://35.160.120.126:1412`);
+    socket.current = io(`https://lati.dotydoty.dev/`, {'transports': ['websocket'], path: '/socketio/' });
   }, [params.userId]);
 
   useEffect(() => {
@@ -139,12 +142,12 @@ const ChatBoxMobile = (props: Props) => {
 
   // Get the message from socket server
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("receive-message", (mess) => {
-        setListMessage([...listMessage, mess] as MessageType[]);
+    if (socket.current ) {
+      socket.current.on("receive-message", async (mess) => {
+        listMessage.length > 0 && setListMessage([...listMessage, mess] as MessageType[]);
       });
     }
-  }, [MessageData]);
+  }, [listMessage]);
 
   return (
     <ChatBoxStyled>
@@ -170,7 +173,12 @@ const ChatBoxMobile = (props: Props) => {
           <div className="status"><Skeleton width= {70}/></div>
         </div>
       </div>}
-      <div className="chat-content">
+      <div className="chat-content" ref = {scroll}>
+      {isLoading && (
+          <div className="loading">
+            <LoadingIcon />
+          </div>
+        )}
         {listMessage.map((message) => <div key = {message._id}  className={message.senderId === params.userId ? 'receiver' : 'sender'}>
         {message.senderId === params.userId && 
         <div><AvatarChat 
@@ -224,6 +232,7 @@ const ChatBoxStyled = styled.div`
     top: 0;
     left: 0;
     right: 0;
+    z-index: 999;
         .back{
             margin-right: 5px;
             svg{
@@ -260,9 +269,9 @@ const ChatBoxStyled = styled.div`
 
   .chat-content {
     width: 100%;
-    height: 100vh;
-    padding: 60px 5px 64px 5px;
-    overflow-y: auto;
+    height: calc(100vh - 113px);
+    margin-top: 60px;
+    overflow-y: scroll;
     overflow-x: hidden;
 
 
@@ -270,6 +279,7 @@ const ChatBoxStyled = styled.div`
       display: flex;
       justify-content: flex-end;
       margin-bottom: 6px;
+      text-align: right;
       p {
         display: inline-block;
         border-radius: 15px;
@@ -330,6 +340,7 @@ const ChatBoxStyled = styled.div`
   }
 
   .chat-footer {
+    background-color: #fff;
     position: fixed;
     bottom: 0;
     left: 0;

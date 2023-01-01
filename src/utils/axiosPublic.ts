@@ -1,7 +1,7 @@
 import axios from "axios";
-// https://lati-server.onrender.com/api/
+
 const axiosPublic = axios.create({
-    baseURL: 'https://lati-server.onrender.com/api/'
+    baseURL: `https://lati.dotydoty.dev/api/`
 })
 
 export default axiosPublic

@@ -25,6 +25,14 @@ import { LoadingIcon } from "components/index";
 type Props = {};
 
 const ChatBox = (props: Props) => {
+  const params = useParams();
+  const [getChatId, { data: chatIdData }] = useGetChatIdMutation();
+  const [getChats, { data: dataChats }] = useGetChatsMutation();
+  const [createChat, { data }] = useCreateChatMutation();
+  const [sendMessage, { data: MessageData }] = useSendMessageMutation();
+  const [getMessages, { data: MessagesData, isLoading }] = useGetMessagesMutation();
+  const { data: userData } = useGetUserQuery(params.userId as string);
+
   const { login } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
 
@@ -33,19 +41,13 @@ const ChatBox = (props: Props) => {
   const [listMessage, setListMessage] = useState<MessageType[] | []>([]);
   const [chatId, setChatId] = useState("");
 
-  const params = useParams();
   const isUserOnline = useOnlineUsers(params.userId as string);
   const socket = useRef<Socket>();
 
   const secondRender = useRef(false);
   const scroll = useRef<HTMLDivElement>(null);
 
-  const [getChatId, { data: chatIdData }] = useGetChatIdMutation();
-  const [getChats, { data: dataChats }] = useGetChatsMutation();
-  const [createChat, { data }] = useCreateChatMutation();
-  const [sendMessage, { data: MessageData }] = useSendMessageMutation();
-  const [getMessages, { data: MessagesData }] = useGetMessagesMutation();
-  const { data: userData } = useGetUserQuery(params.userId as string);
+
 
   const handleSetMessage = (emoji: { emoji: React.SetStateAction<string> }) =>
     setMessage((prev) => (prev += emoji.emoji));
@@ -100,7 +102,7 @@ const ChatBox = (props: Props) => {
     } else secondRender.current = true;
     setListMessage([]);
 
-    socket.current = io(`https://35.160.120.126:1412`);
+    socket.current = io(`https://lati.dotydoty.dev/`, {'transports': ['websocket'], path: '/socketio/' });
   }, [params.userId]);
 
   useEffect(() => {
@@ -147,12 +149,12 @@ const ChatBox = (props: Props) => {
 
   // Get the message from socket server
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("receive-message", (mess) => {
-        setListMessage([...listMessage, mess] as MessageType[]);
+    if (socket.current ) {
+      socket.current.on("receive-message", async (mess) => {
+        listMessage.length > 0 && setListMessage([...listMessage, mess] as MessageType[]);
       });
     }
-  }, [MessageData]);
+  }, [listMessage]);
 
   return (
     <ChatBoxStyled>
@@ -178,7 +180,8 @@ const ChatBox = (props: Props) => {
         </div>
       )}
       <div className="chat-content" ref={scroll}>
-        {!MessagesData && (
+        
+        {isLoading && (
           <div className="loading">
             <LoadingIcon />
           </div>

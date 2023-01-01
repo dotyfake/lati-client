@@ -117,7 +117,7 @@ const Player = styled.div`
       background-color: #40d879;
       padding: 0 5px;
       color: #fff;
-      border: 2px solid #fff;
+      outline: 2px solid #fff;
       font-weight: 500;
       font-size: 14px;
     }
@@ -256,9 +256,9 @@ const RecommendPlayers = (props: Props) => {
                             <span>/Trận</span>
                           </div>
                         </div>
-                        <div className="status">
-                        { onlineUser.some(user =>  user.userId === player.userId) ? 'Online' : null}
-                        </div>
+                        {onlineUser.some(user =>  user.userId === player.userId) &&<div className="status">
+                        Online
+                        </div>}
                       </div>
                     </Player>
                   </Link>

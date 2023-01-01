@@ -44,7 +44,7 @@ function App() {
       firstRender.current = true
     } else {
       if(isAuth){
-        socket.current = io(`http://35.160.120.126:1412`);
+        socket.current = io(`https://lati.dotydoty.dev/`, {'transports': ['websocket'], path: '/socketio/' });
         socket.current.emit("new-user-add", login.userInfo?.id);
         socket.current.on("get-users", (users) => {
           dispatch(setOnlineUsers(users));
